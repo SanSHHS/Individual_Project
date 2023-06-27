@@ -46,16 +46,16 @@ import random
 #     # def count_non_wealthy(model) -> int:
 #     #     return sum([ 1 for agent in model.schedule.agents if agent.wealth == 0])
 
-class MoneyModel(mesa.Model):
-    """A model with some number of agents."""
+# class MoneyModel(mesa.Model):
+#     """A model with some number of agents."""
 
-    def __init__(self, N):
-        self.num_agents = N
-        self.schedule = mesa.time.RandomActivation(self)
-        # Create agents
-        for i in range(self.num_agents):
-            a = Players(i, self)
-            self.schedule.add(a)
+#     def __init__(self, N):
+#         self.num_agents = N
+#         self.schedule = mesa.time.RandomActivation(self)
+#         # Create agents
+#         for i in range(self.num_agents):
+#             a = Players(i, self)
+#             self.schedule.add(a)
 
 
 class MyModel(Model):
