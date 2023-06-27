@@ -5,15 +5,24 @@ from mesa.time import RandomActivation
 
 class Players(Agent):
     """An agent with fixed initial wealth."""
-    def __init__(self, unique_id, model, contract, reputation, skill, value):
+    def __init__(self, unique_id, model, age, contract, reputation, skill, value):
         super().__init__(unique_id, model)
+        self.age = age
         self.contract = contract
         self.reputation = reputation
         self.skill = skill
         self.value = value
 
+    def set_value(self):
+        self.value = self.reputation * self.skill
+
+    
+
     def step(self):
         print("Player made!")
+        print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + str(self.reputation) + ". My skill is " + str(self.skill) 
+              + ". My value is " + str(self.value) + ".")
+        
 
 
 class Club(Agent):

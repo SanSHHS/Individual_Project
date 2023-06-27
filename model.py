@@ -63,31 +63,33 @@ class MyModel(Model):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(10, 10, torus=False)
 
-        for i in range(N):
-            club = Club(i, self, revenue = 1000, spending = 500, objectives = 2, fans = 100)
-            self.schedule.add(club)
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
-            self.grid.place_agent(club, (x, y))
+        # for i in range(N):
+        #     club = Club(i, self, revenue = 1000, spending = 500, objectives = 2, fans = 100)
+        #     self.schedule.add(club)
+        #     x = random.randrange(self.grid.width)
+        #     y = random.randrange(self.grid.height)
+        #     self.grid.place_agent(club, (x, y))
 
         for i in range(N):
-            player = Players(i + N, self, contract = "Signed", reputation = 1, skill = random.randint(1, 10), value = 0)
+            player = Players(i + N, self, age = random.randint(18, 40), contract = "Signed", reputation = random.randint(1, 10), 
+                             skill = random.randint(1, 10), value = 0)
+            player.set_value()
             self.schedule.add(player)
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
-            self.grid.place_agent(player, (x, y))
+            # x = random.randrange(self.grid.width)
+            # y = random.randrange(self.grid.height)
+            # self.grid.place_agent(player, (x, y))
 
-        for i in range(N):
-            agent = F_Agents(i + N + N, self, cut = 0.1, network = random.randint(1, 10), n_skills=random.randint(1, 10), clients = [])
-            self.schedule.add(agent)
+        # for i in range(N):
+        #     agent = F_Agents(i + N + N, self, cut = 0.1, network = random.randint(1, 10), n_skills=random.randint(1, 10), clients = [])
+        #     self.schedule.add(agent)
 
-            # Assign random players as clients to the agent
-            random_players = random.sample(self.schedule.agents[N:N+N], 2)
-            for player in random_players:
-                agent.add_client(player)
+        #     # Assign random players as clients to the agent
+        #     random_players = random.sample(self.schedule.agents[N:N+N], 2)
+        #     for player in random_players:
+        #         agent.add_client(player)
 
     def step(self):
         self.schedule.step()
 
-empty_model = MyModel(10)
+empty_model = MyModel(2)
 empty_model.step()
