@@ -16,17 +16,32 @@ class Players(Agent):
 
     # Set the players' value
     def set_value(self):
-        self.value = self.reputation * self.skill / self.age
+        self.value = round(self.reputation * self.skill / self.age, 2)
 
     # Link players with agents
     def add_agent(self, F_agents):
         self.agent.append(F_agents)
 
+    # Player ages
+    def ageing(self):
+        self.age += 1
+
+    # Remove player
+    # def retires(self):
+    #     if self.age == 40:
+    #         self.schedule.remove(self)
+    #         self.grid.remove_agent(self)
+    #         self.kill_agents.remove(self)
 
     def step(self):
         print("Player made!")
-        print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + str(self.reputation) + ". My skill is " + str(self.skill) 
-              + ". My value is " + str(self.value) + ".")
+        print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + 
+              str(self.reputation) + ". My skill is " + str(self.skill) + ". My value is " + str(self.value) + " millions.")
+        
+        if self.model.schedule.steps != 0 and self.model.schedule.steps % 10 == 0:
+            self.ageing()
+
+        # self.retires()
 
 class Club(Agent):
     """An agent with fixed initial wealth."""
