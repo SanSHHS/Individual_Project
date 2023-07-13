@@ -14,31 +14,42 @@ def set_club_type(club, type):
     """
     if type == 1:
         club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(700, 1000)
+        club.fans = random.randint(70, 100)
     if type == 2:
         club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(300, 700)
+        club.fans = random.randint(30, 70)
     if type == 3:
         club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(10, 300)
+        club.fans = random.randint(1, 30)
 
 
 class Club(Agent):
-    def __init__(self, unique_id, model, revenue, spending, type):
+    def __init__(self, unique_id, model, type):
         super().__init__(unique_id, model)
-        self.revenue = revenue
-        self.spending = spending
+        self.revenue = 0
+        self.spending = 0
         self.type = type
         self.objectives = 0
         self.fans = 0
         self.team = []
+        self.budget = 0
         set_club_type(self, type)
 
     def add_player(self, player):
         self.team.append(player)
 
     def set_revenue(self):
-        self.revenue = 700 * self.fans
+        """For small clubs its 7000 - 210 000, medium clubs 210 000 - 490 000, big club 490 000 - 700 000"""
+        self.revenue = 2 * self.fans
+
+    def set_spending(self):
+        self.spending = 0
+        for player in self.team:
+            self.spending += player.salary
+        self.spending = round(self.spending, 2)
+
+    def set_budget(self):
+        self.budget = self.revenue - self.spending
 
     def team_level(self):
         if len(self.team) > 0:
@@ -49,13 +60,21 @@ class Club(Agent):
             print("No players in the team yet")
 
     def wins(self):
-        self.fans *= 1.3
+        self.fans = round(self.fans * 1.3)
     
     def step(self):
+        if self.model.schedule.steps == 0 or self.model.schedule.steps % 2 == 1:
+            self.set_spending()
+
+        if self.model.schedule.steps % 2 == 0:
+            self.set_budget()
+
+
         squad_id = [str(player.unique_id) for player in self.team]
         squad_list = ', '.join(squad_id)
-        print("Club made!" + str(self.unique_id) + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
-              str(self.team_level()) + ". The revenue is " + str(self.revenue) + ".")
+        print("Club " + str(self.unique_id) + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
+              str(self.team_level()) + ". The revenue is " + str(self.revenue) + ". The number of fan is " + str(self.fans) + ". Spending is " + 
+              str(self.spending) + ". The budget is " + str(self.budget) + ".")
 
 class F_Agents(Agent):
     def __init__(self, unique_id, model, cut, network, n_skills):
@@ -71,19 +90,24 @@ class F_Agents(Agent):
     def step(self):
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
-        print("Agent made!" + str(self.unique_id) + " My clients are: " + client_list + ".")
+        print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
 
 class Players(Agent):
     """An agent with fixed initial wealth."""
-    def __init__(self, unique_id, model, age, contract, reputation, skill, value):
+    def __init__(self, unique_id, model, age, contract, reputation, skill):
         super().__init__(unique_id, model)
         self.age = age
         self.contract = contract
         self.reputation = reputation
         self.skill = skill
-        self.value = value
+        self.value = 0
+        self.salary = 0
         self.F_agent = None
         self.club = None
+
+    # Set the players' salary
+    def set_salary(self):
+        self.salary = round(self.reputation * self.skill / self.age * self.F_agent.n_skills, 2)
 
     # Set the players' value
     def set_value(self):
@@ -106,14 +130,13 @@ class Players(Agent):
         self.age += 1
 
     def step(self):
-        print("Player made!")
         print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + 
-              str(self.reputation) + ". My skill is " + str(self.skill) + ". My value is " + str(self.value) + " millions.")
+              str(self.reputation) + ". My skill is " + str(self.skill) + ". My value is " + str(self.value) + " millions. My salary is " + str(self.salary) + ".")
         
         if self.F_agent is not None:
             print("My agent is agent " + str(self.F_agent.unique_id) + ". My club is club " + str(self.club.unique_id))
         
         # Player is one year older each 10 steps
-        if self.model.schedule.steps != 0 and self.model.schedule.steps % 10 == 0:
+        if self.model.schedule.steps != 0 and self.model.schedule.steps % 4 == 0:
             self.ageing()
     
