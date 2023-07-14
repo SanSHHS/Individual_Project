@@ -45,16 +45,16 @@ class MyModel(mesa.Model):
             self.winner()
 
         if self.schedule.steps != 0 and self.schedule.steps % 2 == 0:
+            self.average_skill_levels()
+            self.print_average_skill_levels()
             print("Transfer market opens")
             self.open_market()
-            club0 = self.clubs[0]
-            club1 = self.clubs[1]
-            player1 = self.market[0]
-            self.transfer(player1, club1)
-            
+            self.club_incentives()
 
+            
         self.schedule.step()
         self.retire_players()
+
         player_count = self.count_players()
         # print("Number of players: ", player_count)
 
@@ -65,8 +65,8 @@ class MyModel(mesa.Model):
         if self.schedule.steps != 1 and self.schedule.steps % 2 == 1:
 
             print("Close")
-            self.average_skill_levels()
-            self.print_average_skill_levels()
+            # self.average_skill_levels()
+            # self.print_average_skill_levels()
             self.print_club()
 
         # player_count = self.count_players()
@@ -95,37 +95,27 @@ class MyModel(mesa.Model):
             player_id = self.highest_unique_id
             player = Players(player_id, self, age = random.randint(18, 39), contract = "Signed", reputation = random.randint(1, 10), 
                              skill = random.randint(1, 10))
+            player.set_potential()
             player.set_value()
             self.schedule.add(player)
 
-            # Link players to agents
-            # a_choices = self.pool.copy()
-            # max_a = self.num_players / self.num_agents
-            # for a in a_choices:
-            #     if len(a.clients) == max_a:
-            #         a_choices.remove(a)
-            # choice = random.choice(a_choices)
-            # player.link_agent(choice)
-
-            # c_choices = self.clubs.copy()
-            # max_c = self.num_players / self.num_clubs
-            # for c in c_choices:
-            #     if len(c.team) == max_c:
-            #         c_choices.remove(c)
-            # choice = random.choice(c_choices)
-            # player.join_club(choice)
-
-
-            choice = random.choice(self.pool)
+            # Link players to agents evenly
+            available_agents = []
+            max_a = self.num_players / self.num_agents
+            available_agents = [a for a in self.pool if len(a.clients) < max_a]
+            choice = random.choice(available_agents)
             player.link_agent(choice)
 
-
-            choice = random.choice(self.clubs)
+            # Link players to clubs evenly
+            available_clubs = []
+            max_c = self.num_players / self.num_clubs
+            available_clubs = [c for c in self.clubs if len(c.team) < max_c]
+            choice = random.choice(available_clubs)
             player.join_club(choice)
 
             player.set_salary()
 
-            # Add the agent to a random grid cell
+            # Add players to a random grid cell
             x = self.random.randrange(self.grid.width)
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(player, (x, y))
@@ -170,41 +160,88 @@ class MyModel(mesa.Model):
             self.second_team_skill_levels[club.unique_id] = team_skill
 
         for key in self.team_skill_levels:
-            if key in self.second_team_skill_levels:
+            if key in self.second_team_skill_levels and self.team_skill_levels[key] is not None and self.second_team_skill_levels[key] is not None:
                 self.final_results[key] = (self.team_skill_levels[key] + self.second_team_skill_levels[key]) / 2
+
+        if len(self.final_results) == 0:
+            print("Not a valid team to compete.")
 
     def print_average_skill_levels(self):
         for club_id, team_skill in self.team_skill_levels.items():
-            print("Club " + str(club_id) + " - Average Team Skill Level: " + str(team_skill))
+            print("Club " + str(club_id) + " has average level of: " + str(team_skill) + " before transfers")
 
     def print_final_skill_levels(self):
         for club_id, team_skill in self.final_results.items():
-            print("Club " + str(club_id) + " - Season Average Team Skill Level: " + str(team_skill))
+            print("Club " + str(club_id) + " season average level is: " + str(team_skill))
 
     def winner(self):
         max_key = max(self.final_results, key = lambda x: self.final_results[x])
-        print("The winner is club: ", max_key)
+        season = round(self.schedule.steps / 4)
+        print("The winner of season " + str(season) + " is club " + str(max_key) + ". \n")
         for club in self.clubs:
             if club.unique_id == max_key:
+                for player in club.team:
+                    player.higher_rep()
+                    player.set_salary()
                 club.wins()
                 club.set_revenue()
+                club.set_spending()
+                club.set_budget()
 
     def print_club(self):
         for club in self.clubs:
             print("Club " + str(club.unique_id) + " spends " + str(club.spending) + ".") 
 
+    # Open the market and list all the players
     def open_market(self):
         self.market = []
         for club in self.clubs:
+            club.set_budget()
             for player in club.team:
                 self.market.append(player)
 
+    # Player transfer
     def transfer(self, player, club):
         if player in self.market:
             self.market.remove(player)
-        player.club.revenue += player.value
+        player.club.revenue_from_sales += player.value
         player.club.spending -= player.salary
         player.club.team.remove(player)
         player.join_club(club)
         club.budget -= player.value
         club.set_spending()
+
+
+    def club_incentives(self):
+        clubs = self.clubs.copy()
+        random.shuffle(clubs)
+
+        for club in clubs:
+            target = None
+            skill_level = 0
+
+            if club.type == 1:
+                pass
+            elif club.type == 2:
+                pass
+            elif club.type == 3:
+                pass
+
+            for player in self.market:
+                if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level:
+                    target = player
+                    skill_level = player.skill
+
+            # Find the worst player of the team
+            if club.team:
+                min_player = min(club.team, key=lambda player: player.skill)
+
+                # Execute the transfer
+                if target is not None and target.skill > min_player.skill:
+                    self.transfer(target, club)
+                    print("Club", club.unique_id, "bought player", target.unique_id)
+            else:
+                print("Club", club.unique_id, "has no players in the team.")
+        
+    def sell_players(self):
+        pass

@@ -33,6 +33,7 @@ class Club(Agent):
         self.fans = 0
         self.team = []
         self.budget = 0
+        self.revenue_from_sales = 0
         set_club_type(self, type)
 
     def add_player(self, player):
@@ -49,7 +50,8 @@ class Club(Agent):
         self.spending = round(self.spending, 2)
 
     def set_budget(self):
-        self.budget = self.revenue - self.spending
+        self.budget = round(self.revenue - self.spending + self.revenue_from_sales, 2)
+        self.revenue_from_sales = 0
 
     def team_level(self):
         if len(self.team) > 0:
@@ -61,6 +63,25 @@ class Club(Agent):
 
     def wins(self):
         self.fans = round(self.fans * 1.3)
+
+    def sell_player(self):
+        if self.budget < 0:
+            if self.team:
+                # Determine which player to sell (e.g., lowest skill player)
+                min_player = min(self.team, key=lambda player: player.skill)
+
+                # Remove the player from the team
+                self.team.remove(min_player)
+
+                # Update the budget by adding the player's value
+                self.spending -= min_player.salary
+
+                # Print a message indicating the player has been sold
+                print("Club", self.unique_id, "sold player", min_player.unique_id)
+            else:
+                print("Club", self.unique_id, "has no players in the team.")
+        else:
+            print("Club", self.unique_id, "does not need to sell a player.")
     
     def step(self):
         if self.model.schedule.steps == 0 or self.model.schedule.steps % 2 == 1:
@@ -90,7 +111,7 @@ class F_Agents(Agent):
     def step(self):
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
-        print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
+        # print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
 
 class Players(Agent):
     """An agent with fixed initial wealth."""
@@ -102,6 +123,7 @@ class Players(Agent):
         self.skill = skill
         self.value = 0
         self.salary = 0
+        self.potential = 0
         self.F_agent = None
         self.club = None
 
@@ -111,7 +133,7 @@ class Players(Agent):
 
     # Set the players' value
     def set_value(self):
-        self.value = round(self.reputation * self.skill / self.age, 2)
+        self.value = round(self.reputation * self.skill * self.potential / self.age, 2)
 
     # Link players with agents
     def link_agent(self, F_agents):
@@ -123,18 +145,23 @@ class Players(Agent):
         club.add_player(self)
 
     def higher_rep(self):
-        self.reputation += 5
+        self.reputation += 1
 
-    # Player ages
+    def set_potential(self):
+        self.potential = self.skill + random.randint(0, 10)
+
+    # Player ages and get closer to their potential
     def ageing(self):
         self.age += 1
+        if self.skill < self.potential:
+            self.skill += 1
 
     def step(self):
         print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + 
               str(self.reputation) + ". My skill is " + str(self.skill) + ". My value is " + str(self.value) + " millions. My salary is " + str(self.salary) + ".")
         
-        if self.F_agent is not None:
-            print("My agent is agent " + str(self.F_agent.unique_id) + ". My club is club " + str(self.club.unique_id))
+        # if self.F_agent is not None:
+            # print("My agent is agent " + str(self.F_agent.unique_id) + ". My club is club " + str(self.club.unique_id))
         
         # Player is one year older each 10 steps
         if self.model.schedule.steps != 0 and self.model.schedule.steps % 4 == 0:
