@@ -45,9 +45,10 @@ class Club(Agent):
 
     def set_spending(self):
         self.spending = 0
-        for player in self.team:
-            self.spending += player.salary
-        self.spending = round(self.spending, 2)
+        # for player in self.team:
+        #     self.spending += player.salary
+        # self.spending = round(self.spending, 2)
+        self.spending = round(sum(player.salary for player in self.team), 2)
 
     def set_budget(self):
         self.budget = round(self.revenue - self.spending + self.revenue_from_sales, 2)
@@ -67,8 +68,27 @@ class Club(Agent):
     def sell_player(self):
         if self.budget < 0:
             if self.team:
-                # Determine which player to sell (e.g., lowest skill player)
+                # Find the worst skilled player in the team
                 min_player = min(self.team, key=lambda player: player.skill)
+
+                # Try to find a potential buyer club
+                if self.model.club_incentives(min_player):
+                    print("Club", self.unique_id, "sold player ", min_player.unique_id)
+
+                else:
+                    print("Club", self.unique_id, "could not find a buyer for the worst skilled player.")
+                    self.release_player(min_player)
+            else:
+                print("Club", self.unique_id, "has no players in the team.")
+        else:
+            print("Club", self.unique_id, "does not need to sell a player.")
+
+
+    def release_player(self, min_player):
+        # if self.budget < 0:
+        #     if self.team:
+        #         # Determine which player to sell (e.g., lowest skill player)
+        #         min_player = min(self.team, key=lambda player: player.skill)
 
                 # Remove the player from the team
                 self.team.remove(min_player)
@@ -77,11 +97,8 @@ class Club(Agent):
                 self.spending -= min_player.salary
 
                 # Print a message indicating the player has been sold
-                print("Club", self.unique_id, "sold player", min_player.unique_id)
-            else:
-                print("Club", self.unique_id, "has no players in the team.")
-        else:
-            print("Club", self.unique_id, "does not need to sell a player.")
+                print("Club", self.unique_id, "released player", min_player.unique_id)
+
     
     def step(self):
         if self.model.schedule.steps == 0 or self.model.schedule.steps % 2 == 1:
@@ -89,6 +106,9 @@ class Club(Agent):
 
         if self.model.schedule.steps % 2 == 0:
             self.set_budget()
+
+        if self.model.schedule.steps != 0 and self.model.schedule.steps % 2 == 0:
+            self.sell_player()
 
 
         squad_id = [str(player.unique_id) for player in self.team]
@@ -104,14 +124,20 @@ class F_Agents(Agent):
         self.network = network
         self.n_skills = n_skills
         self.clients = []
+        self.money = 0
 
     def add_client(self, player):
         self.clients.append(player)
+
+    def earn(self, contract):
+        self.money += self.cut /100 * contract
+        self.money = round(self.money, 2)
 
     def step(self):
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
         # print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
+        print("Agent " + str(self.unique_id) + " money is " + str(self.money) + ".")
 
 class Players(Agent):
     """An agent with fixed initial wealth."""
@@ -130,6 +156,7 @@ class Players(Agent):
     # Set the players' salary
     def set_salary(self):
         self.salary = round(self.reputation * self.skill / self.age * self.F_agent.n_skills, 2)
+        self.F_agent.earn(self.salary)
 
     # Set the players' value
     def set_value(self):
@@ -166,4 +193,6 @@ class Players(Agent):
         # Player is one year older each 10 steps
         if self.model.schedule.steps != 0 and self.model.schedule.steps % 4 == 0:
             self.ageing()
+            self.set_salary()
+            self.set_value()
     
