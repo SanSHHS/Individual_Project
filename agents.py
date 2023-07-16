@@ -85,19 +85,18 @@ class Club(Agent):
 
 
     def release_player(self, min_player):
-        # if self.budget < 0:
-        #     if self.team:
-        #         # Determine which player to sell (e.g., lowest skill player)
-        #         min_player = min(self.team, key=lambda player: player.skill)
+        if min_player in self.team:
+            # Remove the player from the team
+            self.team.remove(min_player)
 
-                # Remove the player from the team
-                self.team.remove(min_player)
+            # Update the budget by adding the player's value
+            self.spending -= min_player.salary
 
-                # Update the budget by adding the player's value
-                self.spending -= min_player.salary
-
-                # Print a message indicating the player has been sold
-                print("Club", self.unique_id, "released player", min_player.unique_id)
+            # Print a message indicating the player has been released
+            print("Club", self.unique_id, "released player", min_player.unique_id)
+        else:
+            print("Release gone wrong Club", self.unique_id, "does not have player", min_player.unique_id)
+        min_player.join_club(None)
 
     
     def step(self):
@@ -168,8 +167,13 @@ class Players(Agent):
         F_agents.add_client(self)
 
     def join_club(self, club):
-        self.club = club
-        club.add_player(self)
+        if club is not None:
+            self.club = club
+            self.contract = "Signed"
+            club.add_player(self)
+        else:
+            self.club = None
+            self.contract = "Free agent"
 
     def higher_rep(self):
         self.reputation += 1
@@ -187,8 +191,8 @@ class Players(Agent):
         print("Hi, I am player " + str(self.unique_id) + ". My age is " + str(self.age) + ". My contract is " + self.contract + ". My rep is " + 
               str(self.reputation) + ". My skill is " + str(self.skill) + ". My value is " + str(self.value) + " millions. My salary is " + str(self.salary) + ".")
         
-        # if self.F_agent is not None:
-            # print("My agent is agent " + str(self.F_agent.unique_id) + ". My club is club " + str(self.club.unique_id))
+        if self.F_agent is not None and self.club is not None:
+            print("My agent is agent " + str(self.F_agent.unique_id) + ". My club is club " + str(self.club.unique_id))
         
         # Player is one year older each 10 steps
         if self.model.schedule.steps != 0 and self.model.schedule.steps % 4 == 0:

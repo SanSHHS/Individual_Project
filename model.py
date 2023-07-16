@@ -4,6 +4,8 @@ from mesa.space import MultiGrid
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from data import datacollector
+
 
 
 class MyModel(mesa.Model):
@@ -31,6 +33,9 @@ class MyModel(mesa.Model):
         self.create_players(P)
 
     def step(self):
+        # Collect data at each step
+        datacollector.collect(self)
+        
         """Advance the model by one step."""
         print("\nStep:", self.schedule.steps)
 
@@ -84,11 +89,21 @@ class MyModel(mesa.Model):
             self.schedule.add(club)
             self.clubs.append(club)
 
+            # Add players to a random grid cell
+            x = self.random.randrange(self.grid.width)
+            y = self.random.randrange(self.grid.height)
+            self.grid.place_agent(club, (x, y))
+
     def create_agents(self, F):
         for i in range(F):
             f_agent = F_Agents(self.num_clubs + i, self, cut = random.randint(3, 10), network = "Signed", n_skills = random.randint(1, 10))
             self.schedule.add(f_agent)
             self.pool.append(f_agent)
+
+            # Add players to a random grid cell
+            x = self.random.randrange(self.grid.width)
+            y = self.random.randrange(self.grid.height)
+            self.grid.place_agent(f_agent, (x, y))
 
     def create_players(self, P):
         for i in range(P):
@@ -101,18 +116,22 @@ class MyModel(mesa.Model):
             self.schedule.add(player)
 
             # Link players to agents evenly
-            available_agents = []
             max_a = self.num_players / self.num_agents
             available_agents = [a for a in self.pool if len(a.clients) < max_a]
-            choice = random.choice(available_agents)
-            player.link_agent(choice)
+            if available_agents:
+                choice = random.choice(available_agents)
+                player.link_agent(choice)
+            else:
+                print("No available agents to link player", player_id)
 
             # Link players to clubs evenly
-            available_clubs = []
             max_c = self.num_players / self.num_clubs
             available_clubs = [c for c in self.clubs if len(c.team) < max_c]
-            choice = random.choice(available_clubs)
-            player.join_club(choice)
+            if available_clubs:
+                choice = random.choice(available_clubs)
+                player.join_club(choice)
+            else:
+                print("No available clubs to join for player", player_id)
 
             player.set_salary()
 
@@ -201,118 +220,148 @@ class MyModel(mesa.Model):
     # Open the market and list all the players
     def open_market(self):
         self.market = []
-        for club in self.clubs:
-            club.set_budget()
-            for player in club.team:
+        for player in self.schedule.agents:
+            if isinstance(player, Players):
                 self.market.append(player)
+
 
     # Player transfer
     def transfer(self, player, club):
+        if player.club is not None:
+            # Change attributes following the transfer
+            player.club.revenue_from_sales += player.value
+            player.club.spending -= player.salary
+            player.club.team.remove(player)
 
-        # Avoid same player transfers multiple times in the same window
-        if player in self.market:
-            self.market.remove(player)
-
-        # Change attributes following the transfer
         player.F_agent.earn(player.value)
-        player.club.revenue_from_sales += player.value
-        player.club.spending -= player.salary
-        player.club.team.remove(player)
         player.join_club(club)
         club.budget -= player.value
         club.set_spending()
 
+        # Avoid same player transfers multiple times in the same window
+        self.market.remove(player)
+
     # Club buys players
-    def club_incentives(self, target_player = None):
+    def club_incentives(self, selled_player = None):
         # Randomize order of clubs for fairness
         clubs = self.clubs.copy()
         random.shuffle(clubs)
 
         for club in clubs:
-            target = None
-            skill_level = 0
-            min_potential = 0
+            if club != self:  # Skip current club
+                target = None
+                skill_level = 0
+                min_potential = 0
+                free_agents = [player for player in self.market if player.club is None]
 
-            # Behavior for Big clubs _ search for high skill player
-            if club.type == 1:
-                if target_player is None:
-            # Choose player suitable player for the club
-                    for player in self.market:
-                        if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level:
-                            target = player
-                            skill_level = player.skill
-                else:
-                    if target_player.club != club and target_player.value <= club.budget - target_player.salary:
-                        target = target_player
-                        skill_level = target_player.skill
+                # Behavior for Big clubs _ search for high skill player
+                if club.type == 1:
+                    if selled_player is None:
+                # Choose player suitable player for the club
+                        for player in self.market:
+                            if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level:
+                                target = player
+                                skill_level = player.skill
 
-            # Find the worst player of the team
-                if club.team:
-                    min_player = min(club.team, key=lambda player: player.skill)
+                        suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level]
+                        if suitable_free_agents:
+                            # Prioritize free agents if available
+                            target = suitable_free_agents[0]
+                            self.market.remove(target)
 
-                    # Execute the transfer if target is better than worst player of the team
-                    if target is not None and target.skill > min_player.skill:
+                    else:
+                        if selled_player.club != club and selled_player.value <= club.budget - selled_player.salary:
+                            target = selled_player
+                            skill_level = selled_player.skill
+
+
+                # Find the worst player of the team
+                    if club.team:
+                        min_player = min(club.team, key=lambda player: player.skill)
+
+                        # Execute the transfer if target is better than worst player of the team
+                        if target is not None and target.skill > min_player.skill:
+                            self.transfer(target, club)
+                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # if player:
+                            #     return True
+                    else:
+                        print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("Club", club.unique_id, "bought player", target.unique_id)
-                        # if player:
-                        #     return True
-                else:
-                    print("Club", club.unique_id, "has no players in the team.")
+                        print("So Club", club.unique_id, "has bought player", target.unique_id)
 
-            # Behavior for Medium clubs - search for players both good skill level and potential
-            elif club.type == 2:
-                if target_player is None:
-                    for player in self.market:
-                        if (player.club != club and player.value <= club.budget - player.salary
-                            and player.skill > skill_level and player.potential > min_potential):
-                            target = player
-                            skill_level = player.skill
-                            min_potential = player.potential
-                else:
-                    if (target_player.club != club and target_player.value <= club.budget - target_player.salary 
-                        and target_player.potential > min_potential):
-                        target = target_player
-                        skill_level = target_player.skill
-                        min_potential = target_player.potential
+                # Behavior for Medium clubs - search for players both good skill level and potential
+                elif club.type == 2:
+                    if selled_player is None:
+                        for player in self.market:
+                            if (player.club != club and player.value <= club.budget - player.salary
+                                and player.skill > skill_level and player.potential > min_potential):
+                                target = player
+                                skill_level = player.skill
+                                min_potential = player.potential
 
-                # Find the worst player of the team based on skill level
-                if club.team:
-                    min_player = min(club.team, key=lambda player: player.skill)
+                        suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level and agent.potential == min_potential]
+                        if suitable_free_agents:
+                            # Prioritize free agents if available
+                            target = suitable_free_agents[0]
+                            free_agents.remove(target)
 
-                    # Execute the transfer if target has higher skill and potential than the worst player of the team
-                    if target is not None and target.skill > min_player.skill and target.potential > min_player.skill:
+                    else:
+                        if (selled_player.club != club and selled_player.value <= club.budget - selled_player.salary 
+                            and selled_player.potential > min_potential):
+                            target = selled_player
+                            skill_level = selled_player.skill
+                            min_potential = selled_player.potential
+
+
+                    # Find the worst player of the team based on skill level
+                    if club.team:
+                        min_player = min(club.team, key=lambda player: player.skill)
+
+                        # Execute the transfer if target has higher skill and potential than the worst player of the team
+                        if target is not None and target.skill > min_player.skill and target.potential > min_player.skill:
+                            self.transfer(target, club)
+                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # if player:
+                            #     return True
+                    else:
+                        print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("Club", club.unique_id, "bought player", target.unique_id)
-                        # if player:
-                        #     return True
-                else:
-                    print("Club", club.unique_id, "has no players in the team.")
+                        print("So Club", club.unique_id, "has bought", target.unique_id)
 
-            # Behavior for Small clubs - search for players with high potential
-            elif club.type == 3:
-                if target_player is None:
-                    for player in self.market:
-                        if (player.club != club and player.value <= club.budget - player.salary and player.potential > min_potential):
-                            target = player
-                            min_potential = player.potential
-                else:
-                    if (target_player.club != club and target_player.value <= club.budget - target_player.salary
-                    ):
-                        target = target_player
-                        min_potential = target_player.potential
+                # Behavior for Small clubs - search for players with high potential
+                elif club.type == 3:
+                    if selled_player is None:
+                        for player in self.market:
+                            if (player.club != club and player.value <= club.budget - player.salary and player.potential > min_potential):
+                                target = player
+                                min_potential = player.potential
 
-                # Find the worst player of the team based on skill level
-                if club.team:
-                    min_player = min(club.team, key=lambda player: player.skill)
+                        suitable_free_agents = [agent for agent in free_agents if agent.potential == min_potential]
+                        if suitable_free_agents:
+                            # Prioritize free agents if available
+                            target = suitable_free_agents[0]
+                            free_agents.remove(target)
+                    else:
+                        if (selled_player.club != club and selled_player.value <= club.budget - selled_player.salary
+                        ):
+                            target = selled_player
+                            min_potential = selled_player.potential
 
-                    # Execute the transfer if target has higher potential than the worst player of the team
-                    if target is not None and target.potential > min_player.skill:
+                    # Find the worst player of the team based on skill level
+                    if club.team:
+                        min_player = min(club.team, key=lambda player: player.skill)
+
+                        # Execute the transfer if target has higher potential than the worst player of the team
+                        if target is not None and target.potential > min_player.skill:
+                            self.transfer(target, club)
+                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # if player:
+                            #     return True
+                    else:
+                        print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("Club", club.unique_id, "bought player", target.unique_id)
-                        # if player:
-                        #     return True
-                else:
-                    print("Club", club.unique_id, "has no players in the team.")
+                        print("So Club", club.unique_id, "has bought", target.unique_id)
 
         return False
         
