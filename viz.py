@@ -1,62 +1,36 @@
-
-from agent import *
-from model import *
-import mesa
-from mesa.visualization.modules import CanvasGrid, ChartModule
+from mesa.visualization.modules import CanvasGrid, TextElement
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import UserSettableParameter
+from model import MyModel
+from agents import Players
 
+class PlayerInfoElement(TextElement):
+    def __init__(self):
+        super().__init__()
 
-NUMBER_OF_CELLS = 100
+    def render(self, model):
+        players = [agent for agent in model.schedule.agents if isinstance(agent, Players)]
+        # labels = [f"Player {player.unique_id}: Skill={player.skill}, Potential={player.potential}" for player in players]
+        labels = [f"<span style='font-size: 12px;'>Player {player.unique_id}: Skill={player.skill}, Potential={player.potential}</span>" for player in players]
+        return "<br>".join(labels)
 
-SIZE_OF_CANVAS_IN_PIXELS_X = 800
-SIZE_OF_CANVAS_IN_PIXELS_Y = 800
+def player_portrayal(agent):
+    if isinstance(agent, Players):
+        portrayal = {
+            "Shape": "circle",
+            "Color": "green",
+            "Filled": "true",
+            "Layer": 0,
+            "r": 0.5
+        }
+        return portrayal
 
+grid = CanvasGrid(player_portrayal, 10, 10, 500, 500)
+info = PlayerInfoElement()
 
-simulation_params = {
-    "number_of_agents": UserSettableParameter(
-        "slider",
-        "Number of Players",
-        50,     # default
-        10,     # min
-        200,    # max
-        1,      # step
-        description = " Choose how many players to include in the simulation",
-    ),
+server = ModularServer(MyModel,
+                       [grid, info],
+                       "Player Visualization",
+                       {"C": 3, "F": 5, "P": 20, "width": 10, "height": 10})
 
-    "width" : NUMBER_OF_CELLS,
-    "height": NUMBER_OF_CELLS,
-}
-
-def agent_portrayal(agent):
-    portrayal = {"Shape": "circle", "Filled": "true", "r": 0.5}
-
-    if agent.wealth > 0:
-        portrayal["Color"] = "green"
-        portrayal["Layer"] = 0
-    else:
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 1
-        portrayal["r"] = 0.2
-    return portrayal
-
-
-grid = CanvasGrid(agent_portrayal, NUMBER_OF_CELLS, NUMBER_OF_CELLS, SIZE_OF_CANVAS_IN_PIXELS_X, SIZE_OF_CANVAS_IN_PIXELS_Y)
-server = ModularServer( MoneyModel, [grid], "Money Model", simulation_params)
-
-# chart = ChartModule([{"Label": "Gini",
-#                       "Color": "Black"}],
-#                     data_collector_name='datacollector')
-
-chart_current = ChartModule([{"Label" : "Wealthy agents", "Color" : "green"},
-                             {"Label" : "Non wealthy agents", "Color" : "red"}],
-                             canvas_height = 300,
-                             data_collector_name = "datacollector")
-
-server = ModularServer(MoneyModel,
-                       [grid, chart_current],
-                       "Money Model",
-                       simulation_params)
-
-server.port = 8521  # The default
-server.launch()
+server.port = 8521  # Set the port for the server
+server.launch()  # Launch the server
