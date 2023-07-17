@@ -13,13 +13,13 @@ def set_club_type(club, type):
         type (int): The type of club.
     """
     if type == 1:
-        club.objectives = random.randint(10, 1000)
+        # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(70, 100)
     if type == 2:
-        club.objectives = random.randint(10, 1000)
+        # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(30, 70)
     if type == 3:
-        club.objectives = random.randint(10, 1000)
+        # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(1, 30)
 
 
@@ -29,7 +29,7 @@ class Club(Agent):
         self.revenue = 0
         self.spending = 0
         self.type = type
-        self.objectives = 0
+        # self.objectives = 0
         self.fans = 0
         self.team = []
         self.budget = 0
@@ -40,7 +40,7 @@ class Club(Agent):
         self.team.append(player)
 
     def set_revenue(self):
-        """For small clubs its 7000 - 210 000, medium clubs 210 000 - 490 000, big club 490 000 - 700 000"""
+        """For small clubs its 2 - 60, medium clubs 60 - 140, big club 140 - 200"""
         self.revenue = 2 * self.fans
 
     def set_spending(self):
@@ -70,10 +70,14 @@ class Club(Agent):
             if self.team:
                 # Find the worst skilled player in the team
                 min_player = min(self.team, key=lambda player: player.skill)
+                print("Min", min_player.unique_id)
 
                 # Try to find a potential buyer club
-                if self.model.club_incentives(min_player):
+                buyer = self.model.sell_incentives(min_player)
+                if buyer:
+                    buyer_club, target_player = buyer
                     print("Club", self.unique_id, "sold player ", min_player.unique_id)
+                    self.model.transfer(target_player, buyer_club)
 
                 else:
                     print("Club", self.unique_id, "could not find a buyer for the worst skilled player.")
@@ -124,6 +128,7 @@ class F_Agents(Agent):
         self.n_skills = n_skills
         self.clients = []
         self.money = 0
+        self.replacement_done = False  # Flag to track replacement
 
     def add_client(self, player):
         self.clients.append(player)
@@ -133,9 +138,10 @@ class F_Agents(Agent):
         self.money = round(self.money, 2)
 
     def step(self):
+
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
-        # print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
+        print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
         print("Agent " + str(self.unique_id) + " money is " + str(self.money) + ".")
 
 class Players(Agent):
