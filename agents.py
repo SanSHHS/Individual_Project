@@ -3,6 +3,8 @@ from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 import random
 
+# Minimum number of player a club must have
+MIN_SQUAD_SIZE = 11
 
 def set_club_type(club, type):
     """Updates club's attributes according to its type:
@@ -15,12 +17,15 @@ def set_club_type(club, type):
     if type == 1:
         # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(70, 100)
+        club.allowed_debt = random.randint(140, 200)
     if type == 2:
         # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(30, 70)
+        club.allowed_debt = random.randint(60, 140)
     if type == 3:
         # club.objectives = random.randint(10, 1000)
         club.fans = random.randint(1, 30)
+        club.allowed_debt = random.randint(0, 60)
 
 
 class Club(Agent):
@@ -35,6 +40,8 @@ class Club(Agent):
         self.budget = 0
         self.revenue_from_sales = 0
         set_club_type(self, type)
+        self.allowed_debt = 0
+        self.deficit = 0
 
     def add_player(self, player):
         self.team.append(player)
@@ -45,13 +52,18 @@ class Club(Agent):
 
     def set_spending(self):
         self.spending = 0
-        # for player in self.team:
-        #     self.spending += player.salary
-        # self.spending = round(self.spending, 2)
         self.spending = round(sum(player.salary for player in self.team), 2)
+
+    def set_deficit(self):
+        x = round(self.revenue - self.spending, 2)
+        if x < 0:
+            self.deficit = -x
+        else:
+            self.deficit = 0
 
     def set_budget(self):
         self.budget = round(self.revenue - self.spending + self.revenue_from_sales, 2)
+        # self.budget = round( , 2)
         self.revenue_from_sales = 0
 
     def team_level(self):
@@ -66,7 +78,7 @@ class Club(Agent):
         self.fans = round(self.fans * 1.3)
 
     def sell_player(self):
-        if self.budget < 0:
+        if len(self.team) > MIN_SQUAD_SIZE and self.budget < 0:
             if self.team:
                 # Find the worst skilled player in the team
                 min_player = min(self.team, key=lambda player: player.skill)
