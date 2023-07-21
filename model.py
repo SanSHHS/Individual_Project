@@ -235,7 +235,7 @@ class MyModel(mesa.Model):
 
     # Player transfer
     def transfer(self, player, club):
-        print("Before transfer - player:", player.unique_id)
+        print("Club", club.unique_id, "bought player", player.unique_id)
         if player.club is not None:
             # Change attributes following the transfer
             player.club.revenue_from_sales += player.value
@@ -250,6 +250,159 @@ class MyModel(mesa.Model):
         # Avoid same player transfers multiple times in the same window
         # self.market.remove(player)
 
+    # Player transfer
+    def bid(self, player, club, offer):
+        print("Club", club.unique_id, "bought player", player.unique_id)
+        if player.club is not None:
+            # Change attributes following the transfer
+            player.club.revenue_from_sales += offer
+            player.club.spending -= player.salary
+            player.club.team.remove(player)
+
+        player.F_agent.earn(player.value)
+        player.join_club(club)
+        club.budget -= offer
+        club.set_spending()
+
+
+    # Club buys players
+    # def club_incentives(self):
+    #     # Randomize order of clubs for fairness
+    #     clubs = self.clubs.copy()
+    #     random.shuffle(clubs)
+
+    #     for club in clubs:
+    #         if club != self:  # Skip current club
+    #             target = None
+    #             skill_level = 0
+    #             potential_level = 0
+    #             free_agents = []
+    #             free_agents = [player for player in self.market if player.club is None]
+
+    #             if club.type == 1:
+    #                 for player in self.market:
+    #                     if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level:
+    #                         target = player
+    #                         skill_level = player.skill
+
+    #                 if free_agents:
+    #                     suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level]
+    #                     if suitable_free_agents:
+    #                         # Prioritize free agents if available
+    #                         target = suitable_free_agents[0]
+    #                         # free_agents.remove(target)
+
+    #                 # Find the worst player of the team
+    #                 if club.team:
+    #                     min_player = min(club.team, key=lambda player: player.skill)
+
+    #                     # Execute the transfer if target is better than worst player of the team
+    #                     if target is not None and target.skill > min_player.skill:
+    #                         self.transfer(target, club)
+    #                         print("Club", club.unique_id, "bought player", target.unique_id)
+    #                         self.market.remove(target)
+    #                         # if player:
+    #                         #     return True
+    #                 else:
+    #                     print("Club", club.unique_id, "has no players in the team.")
+    #                     self.transfer(target, club)
+    #                     print("So Club", club.unique_id, "has bought player", target.unique_id)
+    #                     self.market.remove(target)
+
+    #             if club.type == 2:
+    #                 for player in self.market:
+    #                     if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level and player.potential > potential_level:
+    #                         target = player
+    #                         skill_level = player.skill
+    #                         potential_level = player.potential
+
+    #                 if free_agents:
+    #                     suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level and agent.potential == potential_level]
+    #                     if suitable_free_agents:
+    #                         # Prioritize free agents if available
+    #                         target = suitable_free_agents[0]
+    #                         # free_agents.remove(target)
+
+    #                 # Find the worst player of the team
+    #                 if club.team:
+    #                     min_player = min(club.team, key=lambda player: player.skill)
+
+    #                     # Execute the transfer if target is better than worst player of the team
+    #                     if target is not None and target.skill > min_player.skill and target.potential > min_player.potential:
+    #                         self.transfer(target, club)
+    #                         print("Club", club.unique_id, "bought player", target.unique_id)
+    #                         self.market.remove(target)
+    #                         # if player:
+    #                         #     return True
+    #                 else:
+    #                     print("Club", club.unique_id, "has no players in the team.")
+    #                     self.transfer(target, club)
+    #                     print("So Club", club.unique_id, "has bought player", target.unique_id)
+    #                     self.market.remove(target)
+
+    #             if club.type == 3:
+    #                 for player in self.market:
+    #                     if player.club != club and player.value <= club.budget - player.salary and player.potential > potential_level:
+    #                         target = player
+    #                         potential_level = player.potential
+
+    #                 if free_agents:
+    #                     suitable_free_agents = [agent for agent in free_agents if agent.potential == potential_level]
+    #                     if suitable_free_agents:
+    #                         # Prioritize free agents if available
+    #                         target = suitable_free_agents[0]
+    #                         # free_agents.remove(target)
+
+    #                 # Find the worst player of the team
+    #                 if club.team:
+    #                     min_player = min(club.team, key=lambda player: player.skill)
+
+    #                     # Execute the transfer if target is better than worst player of the team
+    #                     if target is not None and target.potential > min_player.skill:
+    #                         self.transfer(target, club)
+    #                         print("Club", club.unique_id, "bought player", target.unique_id)
+    #                         self.market.remove(target)
+    #                         # if player:
+    #                         #     return True
+    #                 else:
+    #                     print("Club", club.unique_id, "has no players in the team.")
+    #                     self.transfer(target, club)
+    #                     print("So Club", club.unique_id, "has bought player", target.unique_id)
+    #                     self.market.remove(target)
+
+    # Add a method to initiate a bidding war
+    def initiate_bidding_war(self, player, interested_clubs):
+        best_offer = None
+        best_offer_value = 0
+
+        for club in interested_clubs:
+            # Create a bidding logic to determine the value of the offer
+            budget_factor = club.budget / (player.value * 2)
+            normalized_budget_factor = max(0.1, min(1.0, budget_factor))  # Normalize to a value between 0.1 and 1.0
+            offer_value = player.value * normalized_budget_factor
+
+            if offer_value > best_offer_value:
+                best_offer = club
+                best_offer_value = offer_value
+
+        if best_offer is not None:
+            # The player accepts the best offer and joins the club
+            print("Player", player.unique_id, "accepts the offer from Club", best_offer.unique_id)
+            if player.club is not None:
+                    if len(player.club.team) > MIN_SQUAD_SIZE:
+                        self.bid(player, best_offer, best_offer_value)
+                    else:
+                        print("Seller club does not have enough player.")
+
+            # Remove the player from the interested list of other clubs
+            for club in interested_clubs:
+                club.interested_player.remove(player)
+            return True
+        else:
+            print("Player", player.unique_id, "rejects all offers.")
+            return False
+
+
     # Club buys players
     def club_incentives(self):
         # Randomize order of clubs for fairness
@@ -258,102 +411,63 @@ class MyModel(mesa.Model):
 
         for club in clubs:
             if club != self:  # Skip current club
-                target = None
-                skill_level = 0
-                potential_level = 0
-                free_agents = []
-                free_agents = [player for player in self.market if player.club is None]
+                target_list = []
+                min_player = None  # Initialize min_player to None
+
+                 # Find the worst player of the team
+                if club.team:
+                    min_player = min(club.team, key=lambda player: player.skill)
+                else:
+                    print("Club", club.unique_id, "has no players in the team.")
 
                 if club.type == 1:
+
                     for player in self.market:
-                        if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level:
-                            target = player
-                            skill_level = player.skill
+                        if player.club != club and player.value <= club.budget - player.salary and player.skill > min_player.skill:
+                            target_list.append(player)
 
-                    if free_agents:
-                        suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level]
-                        if suitable_free_agents:
-                            # Prioritize free agents if available
-                            target = suitable_free_agents[0]
-                            # free_agents.remove(target)
+                    target_list.sort(key=lambda player: (player.skill, player.contract == "Free agent"), reverse=True)
 
-                    # Find the worst player of the team
-                    if club.team:
-                        min_player = min(club.team, key=lambda player: player.skill)
-
-                        # Execute the transfer if target is better than worst player of the team
-                        if target is not None and target.skill > min_player.skill:
-                            self.transfer(target, club)
-                            print("Club", club.unique_id, "bought player", target.unique_id)
-                            self.market.remove(target)
-                            # if player:
-                            #     return True
-                    else:
-                        print("Club", club.unique_id, "has no players in the team.")
-                        self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought player", target.unique_id)
-                        self.market.remove(target)
 
                 if club.type == 2:
+                    
                     for player in self.market:
-                        if player.club != club and player.value <= club.budget - player.salary and player.skill > skill_level and player.potential > potential_level:
-                            target = player
-                            skill_level = player.skill
-                            potential_level = player.potential
+                        if player.club != club and player.value <= club.budget - player.salary and player.skill > min_player.skill and player.potential > min_player.potential:
+                            target_list.append(player)
 
-                    if free_agents:
-                        suitable_free_agents = [agent for agent in free_agents if agent.skill == skill_level and agent.potential == potential_level]
-                        if suitable_free_agents:
-                            # Prioritize free agents if available
-                            target = suitable_free_agents[0]
-                            # free_agents.remove(target)
+                    target_list.sort(key=lambda player: (player.skill, player.potential, player.contract == "Free agent"), reverse=True)
 
-                    # Find the worst player of the team
-                    if club.team:
-                        min_player = min(club.team, key=lambda player: player.skill)
-
-                        # Execute the transfer if target is better than worst player of the team
-                        if target is not None and target.skill > min_player.skill and target.potential > min_player.potential:
-                            self.transfer(target, club)
-                            print("Club", club.unique_id, "bought player", target.unique_id)
-                            self.market.remove(target)
-                            # if player:
-                            #     return True
-                    else:
-                        print("Club", club.unique_id, "has no players in the team.")
-                        self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought player", target.unique_id)
-                        self.market.remove(target)
 
                 if club.type == 3:
                     for player in self.market:
-                        if player.club != club and player.value <= club.budget - player.salary and player.potential > potential_level:
-                            target = player
-                            potential_level = player.potential
+                        if player.club != club and player.value <= club.budget - player.salary and player.potential > min_player.potential:
+                            target_list.append(player)
 
-                    if free_agents:
-                        suitable_free_agents = [agent for agent in free_agents if agent.potential == potential_level]
-                        if suitable_free_agents:
-                            # Prioritize free agents if available
-                            target = suitable_free_agents[0]
-                            # free_agents.remove(target)
+                    target_list.sort(key=lambda player: (player.potential, player.contract == "Free agent"), reverse=True)
 
-                    # Find the worst player of the team
-                    if club.team:
-                        min_player = min(club.team, key=lambda player: player.skill)
+                club.interested_player = target_list 
 
-                        # Execute the transfer if target is better than worst player of the team
-                        if target is not None and target.potential > min_player.skill:
-                            self.transfer(target, club)
-                            print("Club", club.unique_id, "bought player", target.unique_id)
-                            self.market.remove(target)
-                            # if player:
-                            #     return True
+        # Check for players targeted by multiple clubs
+        targeted_players = set()
+        for club in clubs:
+            for player in club.interested_player:
+                if player in targeted_players:
+                    # Bidding war is initiated
+                    interested_clubs = [c for c in clubs if player in c.interested_player]
+                    self.initiate_bidding_war(player, interested_clubs)
+                else:
+                    targeted_players.add(player)
+
+        # If a player has only one interested club, transfer directly without bidding war
+        for player in targeted_players:
+            interested_clubs = [c for c in clubs if player in c.interested_player]
+            if len(interested_clubs) == 1:
+                if player.club is not None:
+                    if len(player.club.team) > MIN_SQUAD_SIZE:
+                        self.transfer(player, interested_clubs[0])
                     else:
-                        print("Club", club.unique_id, "has no players in the team.")
-                        self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought player", target.unique_id)
-                        self.market.remove(target)
+                        print("Seller club does not have enough player.")
+
         
     # Use to find buyers for a specific player on sell
     def sell_incentives(self, selled_player):
@@ -461,7 +575,7 @@ class MyModel(mesa.Model):
                                 # player.F_agent.clients.remove(player)
                                 # agent.clients.append(player)
                                 self.signing(player, agent)
-                                print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
+                                # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
                                 signing_done = True  # Set flag to True
                                 available_players.remove(player)
                                 # if len(new_clients) > max_a:
@@ -472,7 +586,7 @@ class MyModel(mesa.Model):
                                 # player.F_agent.clients.remove(player)
                                 # agent.clients.append(player)
                                 self.signing(player, agent)
-                                print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
+                                # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
                                 signing_done = True  # Set flag to True
                                 available_players.remove(player)
                                 # if len(new_clients) > max_a:
