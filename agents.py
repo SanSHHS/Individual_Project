@@ -64,10 +64,16 @@ class Club(Agent):
             self.deficit = 0
 
     def set_budget(self):
-        diff = self.allowed_debt - self.deficit
-        self.budget = round(self.revenue - self.spending + self.revenue_from_sales + diff, 2)
-        # self.budget = round( , 2)
-        self.revenue_from_sales = 0
+        if not self.model.FFP:
+            print("No FFP!")
+            diff = self.allowed_debt - self.deficit
+            self.budget = round(self.revenue - self.spending + self.revenue_from_sales + diff, 2)
+            self.revenue_from_sales = 0
+        
+        else:
+            print("FFP Budget!")
+            self.budget = round(self.revenue - self.spending + self.revenue_from_sales, 2)
+            self.revenue_from_sales = 0
 
     def team_level(self):
         if len(self.team) > 0:
@@ -81,7 +87,7 @@ class Club(Agent):
         self.fans = round(self.fans * 1.3)
 
     def sell_player(self):
-        if len(self.team) > MIN_SQUAD_SIZE and self.budget < 0:
+        while len(self.team) > MIN_SQUAD_SIZE and self.budget < 0:
             if self.team:
                 # Find the worst skilled player in the team
                 min_player = min(self.team, key=lambda player: player.skill)
@@ -99,8 +105,8 @@ class Club(Agent):
                     self.release_player(min_player)
             else:
                 print("Club", self.unique_id, "has no players in the team.")
-        else:
-            print("Club", self.unique_id, "does not need to sell a player.")
+                
+        print("Club", self.unique_id, "does not need to sell a player.")
 
 
     def release_player(self, min_player):
