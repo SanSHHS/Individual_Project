@@ -13,7 +13,7 @@ from mesa.datacollection import DataCollector
 class MyModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, C, F, P, width, height):
+    def __init__(self, C, F, P, width, height, league_range, FFP = False):
         self.num_clubs = C
         self.num_agents = F
         self.num_players = P
@@ -27,12 +27,126 @@ class MyModel(mesa.Model):
         self.second_team_skill_levels = {}
         self.final_results = {}
         self.market = []
-        self.FFP = False
+        self.FFP = FFP
         self.winner_id = None
+        self.league_range = league_range
+        self.running = True
+        
+        # 0 - 19 : Premier League
+        # 20 - 39: La Liga
+        # 40 - 59: Serie A
+        # 60 - 77: Bundesliga
+        # 78 - 97: Ligue 1
+        self.league_data = {
+            "0": {"name": "Manchester City", "type": 1, "fan": 840, "debt": 199,},
+            "1": {"name": "Liverpool", "type": 1, "fan": 850,"debt": 169,},
+            "2": {"name": "Manchester United", "type": 1, "fan": 1000,"debt": 94,},
+            "3": {"name": "Chelsea", "type": 1, "fan": 860,"debt": 51,},
+            "4": {"name": "Tottenham", "type": 1, "fan": 600,"debt": 143,},
+            "5": {"name": "Arsenal", "type": 1, "fan": 666,"debt": 35,},
+            "6": {"name": "West Ham", "type": 1, "fan": 100,"debt": 120,},
+            "7": {"name": "Leicester", "type": 1, "fan": 100,"debt": 120,},
+            "8": {"name": "Leeds", "type": 1, "fan": 100,"debt": 120,},
+            "9": {"name": "Everton", "type": 1, "fan": 100,"debt": 120,},
+            "10": {"name": "Newcastle", "type": 1, "fan": 100,"debt": 120,},
+            "11": {"name": "Brighton", "type": 1, "fan": 100,"debt": 120,},
+            "12": {"name": "Aston Villa", "type": 1, "fan": 100,"debt": 120,},
+            "13": {"name": "Wolves", "type": 1, "fan": 100,"debt": 120,},
+            "14": {"name": "Crystal Palace", "type": 1, "fan": 100,"debt": 120,},
+            "15": {"name": "Southampton", "type": 1, "fan": 100,"debt": 120,},
+            "16": {"name": "Brentford", "type": 1, "fan": 100,"debt": 120,},
+            "17": {"name": "Norwich", "type": 1, "fan": 100,"debt": 120,},
+            "18": {"name": "Watford", "type": 1, "fan": 100,"debt": 120,},
+            "19": {"name": "Burnley", "type": 1, "fan": 100,"debt": 120,},
+
+            "20": {"name": "Real Madrid", "type": 1, "fan": 100,"debt": 120,},
+            "21": {"name": "Barcelona", "type": 1, "fan": 100,"debt": 120,},
+            "22": {"name": "Atletico de Madrid", "type": 1, "fan": 100,"debt": 120,},
+            "23": {"name": "Sevilla", "type": 1, "fan": 100,"debt": 120,},
+            "24": {"name": "Villarreal", "type": 1, "fan": 100,"debt": 120,},
+            "25": {"name": "Real Sociedad", "type": 1, "fan": 100,"debt": 120,},
+            "26": {"name": "Athletic Bilbao", "type": 1, "fan": 100,"debt": 120,},
+            "27": {"name": "Real Betis", "type": 1, "fan": 100,"debt": 120,},
+            "28": {"name": "Valencia", "type": 1, "fan": 100,"debt": 120,},
+            "29": {"name": "Espanyol", "type": 1, "fan": 100,"debt": 120,},
+            "30": {"name": "Getafe", "type": 1, "fan": 100,"debt": 120,},
+            "31": {"name": "Celta Vigo", "type": 1, "fan": 100,"debt": 120,},
+            "32": {"name": "Osasuna", "type": 1, "fan": 100,"debt": 120,},
+            "33": {"name": "Almeria", "type": 1, "fan": 100,"debt": 120,},
+            "34": {"name": "Rayo Vallecano", "type": 1, "fan": 100,"debt": 120,},
+            "35": {"name": "Mallorca", "type": 1, "fan": 100,"debt": 120,},
+            "36": {"name": "Valladolid", "type": 1, "fan": 100,"debt": 120,},
+            "37": {"name": "Cadiz", "type": 1, "fan": 100,"debt": 120,},
+            "38": {"name": "Girona", "type": 1, "fan": 100,"debt": 120,},
+            "39": {"name": "Elche", "type": 1, "fan": 100,"debt": 120,},
+
+            "40": {"name": "Atalanta", "type": 1, "fan": 100,"debt": 120,},
+            "41": {"name": "Bologna", "type": 1, "fan": 100,"debt": 120,},
+            "42": {"name": "Cagliari", "type": 1, "fan": 100,"debt": 120,},
+            "43": {"name": "Empoli", "type": 1, "fan": 100,"debt": 120,},
+            "44": {"name": "Fiorentina", "type": 1, "fan": 100,"debt": 120,},
+            "45": {"name": "Frosinone", "type": 1, "fan": 100,"debt": 120,},
+            "46": {"name": "Genoa", "type": 1, "fan": 100,"debt": 120,},
+            "47": {"name": "Hellas Verona", "type": 1, "fan": 100,"debt": 120,},
+            "48": {"name": "Inter Milan", "type": 1, "fan": 100,"debt": 120,},
+            "49": {"name": "Juventus", "type": 1, "fan": 100,"debt": 120,},
+            "50": {"name": "Lazio", "type": 1, "fan": 100,"debt": 120,},
+            "51": {"name": "Lecce", "type": 1, "fan": 100,"debt": 120,},
+            "52": {"name": "AC Milan", "type": 1, "fan": 100,"debt": 120,},
+            "53": {"name": "Monza", "type": 1, "fan": 100,"debt": 120,},
+            "54": {"name": "Napoli", "type": 1, "fan": 100,"debt": 120,},
+            "55": {"name": "Roma", "type": 1, "fan": 100,"debt": 120,},
+            "56": {"name": "Salernitana", "type": 1, "fan": 100,"debt": 120,},
+            "57": {"name": "Sassuolo", "type": 1, "fan": 100,"debt": 120,},
+            "58": {"name": "Torino", "type": 1, "fan": 100,"debt": 120,},
+            "59": {"name": "Udinese", "type": 1, "fan": 100,"debt": 120,},
+
+            "60": {"name": "Bayern Munich", "type": 1, "fan": 100,"debt": 120,},
+            "61": {"name": "Dortmund", "type": 1, "fan": 100,"debt": 120,},
+            "62": {"name": "RB Leipzig", "type": 1, "fan": 100,"debt": 120,},
+            "63": {"name": "Bayer Leverkusen", "type": 1, "fan": 100,"debt": 120,},
+            "64": {"name": "Hoffenheim", "type": 1, "fan": 100,"debt": 120,},
+            "65": {"name": "Wolfsburg", "type": 1, "fan": 100,"debt": 120,},
+            "66": {"name": "Schalke 04", "type": 1, "fan": 100,"debt": 120,},
+            "67": {"name": "Monchengladbach", "type": 1, "fan": 100,"debt": 120,},
+            "68": {"name": "Frankfurt", "type": 1, "fan": 100,"debt": 120,},
+            "69": {"name": "Werder Bremen", "type": 1, "fan": 100,"debt": 120,},
+            "70": {"name": "Mainz 05", "type": 1, "fan": 100,"debt": 120,},
+            "71": {"name": "Cologne", "type": 1, "fan": 100,"debt": 120,},
+            "72": {"name": "Hertha", "type": 1, "fan": 100,"debt": 120,},
+            "73": {"name": "Augsburg", "type": 1, "fan": 100,"debt": 120,},
+            "74": {"name": "Freiburg", "type": 1, "fan": 100,"debt": 120,},
+            "75": {"name": "Dusseldorf", "type": 1, "fan": 100,"debt": 120,},
+            "76": {"name": "Union Berlin", "type": 1, "fan": 100,"debt": 120,},
+            "77": {"name": "Paderborn", "type": 1, "fan": 100,"debt": 120,},
+
+            "78": {"name": "PSG", "type": 1, "fan": 100,"debt": 120,},
+            "79": {"name": "Marseilles", "type": 1, "fan": 100,"debt": 120,},
+            "80": {"name": "Lyon", "type": 1, "fan": 100,"debt": 120,},
+            "81": {"name": "LOSC", "type": 1, "fan": 100,"debt": 120,},
+            "82": {"name": "Monaco", "type": 1, "fan": 100,"debt": 120,},
+            "83": {"name": "Rennes", "type": 1, "fan": 100,"debt": 120,},
+            "84": {"name": "Angers", "type": 1, "fan": 100,"debt": 120,},
+            "85": {"name": "Bordeaux", "type": 1, "fan": 100,"debt": 120,},
+            "86": {"name": "Brest", "type": 1, "fan": 100,"debt": 120,},
+            "87": {"name": "Clermont", "type": 1, "fan": 100,"debt": 120,},
+            "88": {"name": "Lens", "type": 1, "fan": 100,"debt": 120,},
+            "89": {"name": "Lorient", "type": 1, "fan": 100,"debt": 120,},
+            "90": {"name": "Metz", "type": 1, "fan": 100,"debt": 120,},
+            "91": {"name": "Montpellier", "type": 1, "fan": 100,"debt": 120,},
+            "92": {"name": "Nantes", "type": 1, "fan": 100,"debt": 120,},
+            "93": {"name": "Nice", "type": 1, "fan": 100,"debt": 120,},
+            "94": {"name": "Reims", "type": 1, "fan": 100,"debt": 120,},
+            "95": {"name": "Saint-Etienne", "type": 1, "fan": 100,"debt": 120,},
+            "96": {"name": "Strasbourg", "type": 1, "fan": 100,"debt": 120,},
+            "97": {"name": "Troyes", "type": 1, "fan": 100,"debt": 120,},
+        
+        }
+        
 
         self.datacollector = DataCollector(
             model_reporters={
-                "Winner Club ID": self.get_winner,
+                "Winner Club": self.get_winner,
             }
         )
 
@@ -70,6 +184,9 @@ class MyModel(mesa.Model):
             self.winner()
             self.retire_players()
 
+            # self.datacollector.collect(self)
+
+
         if self.schedule.steps != 0 and self.schedule.steps % 2 == 0:
             self.average_skill_levels()
             self.print_average_skill_levels()
@@ -106,17 +223,24 @@ class MyModel(mesa.Model):
 
     # Functions
     def create_clubs(self, C):
-        for i in range(C):
-            club = Club(i, self, type = random.randint(1, 3))
-            club.set_revenue()
-            club.set_spending()
-            self.schedule.add(club)
-            self.clubs.append(club)
+        start, end = self.league_range
+        if C == end - start + 1:
+            for i, keys in enumerate(range(start, end+1)):
+                club_data = self.league_data[str(keys)]
+                club = Club(i, self, type = random.randint(1, 3))
+                club.name = club_data["name"]
+                club.type = club_data["type"]
+                club.fans = club_data["fan"]
+                club.allowed_debt = club_data["debt"]
+                club.set_revenue()
+                club.set_spending()
+                self.schedule.add(club)
+                self.clubs.append(club)
 
-            # Add players to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(club, (x, y))
+                # Add players to a random grid cell
+                x = self.random.randrange(self.grid.width)
+                y = self.random.randrange(self.grid.height)
+                self.grid.place_agent(club, (x, y))
 
     def create_agents(self, F):
         for i in range(F):
@@ -221,25 +345,35 @@ class MyModel(mesa.Model):
 
     def print_final_skill_levels(self):
         for club_id, team_skill in self.final_results.items():
-            print("Club " + str(club_id) + " season average level is: " + str(team_skill))
+            for club in self.clubs:
+                if club_id == club.unique_id:
+                    print("Club " + str(club.name) + " season average level is: " + str(team_skill))
 
     # Determine the winners
     def winner(self):
         max_key = max(self.final_results, key = lambda x: self.final_results[x])
+        winning_club = None
         season = round(self.schedule.steps / 4)
-        print("The winner of season " + str(season) + " is club " + str(max_key) + ". \n")
-
-        self.winner_id = max_key
-
+        
         for club in self.clubs:
             if club.unique_id == max_key:
-                for player in club.team:
-                    player.higher_rep()
-                    player.set_salary()
-                club.wins()
-                club.set_revenue()
-                club.set_spending()
-                club.set_budget()
+                winning_club = club
+                break
+
+        if winning_club is not None:
+            print("The winner of season " + str(season) + " is " + str(winning_club.name) + ". \n")
+            self.winner_id = max_key
+
+            for player in winning_club.team:
+                player.higher_rep()
+                player.set_salary()
+
+            winning_club.wins()
+            winning_club.set_revenue()
+            winning_club.set_spending()
+            winning_club.set_budget()
+        else:
+            print("No winning team.")
 
     def get_winner(self):
         return self.winner_id
@@ -292,8 +426,9 @@ class MyModel(mesa.Model):
         for club in interested_clubs:
             # Create a bidding logic to determine the value of the offer
             budget_factor = club.budget / (player.value * 2)
-            normalized_budget_factor = max(0.1, min(1.0, budget_factor))  # Normalize to a value between 0.1 and 1.0
-            offer_value = player.value * normalized_budget_factor
+            # normalized_budget_factor = max(0.1, min(1.0, budget_factor))  # Normalize to a value between 0.1 and 1.0
+            # offer_value = player.value * normalized_budget_factor
+            offer_value = player.value * budget_factor
 
             if offer_value > best_offer_value:
                 best_offer = club
