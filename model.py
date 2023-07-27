@@ -57,90 +57,90 @@ class MyModel(mesa.Model):
             "19": {"name": "Burnley", "type": 3, "fan": 40,"debt": 0, "tv": 123,},
 
             # 20 - 39: La Liga 21/22 tv rights, 
-            "20": {"name": "Real Madrid", "type": 1, "fan": 100,"debt": 120, "tv": 161,},
-            "21": {"name": "Barcelona", "type": 1, "fan": 100,"debt": 120, "tv": 160,},
-            "22": {"name": "Atletico de Madrid", "type": 1, "fan": 100,"debt": 120, "tv": 130,},
-            "23": {"name": "Sevilla", "type": 1, "fan": 100,"debt": 120, "tv": 88,},
-            "24": {"name": "Villarreal", "type": 1, "fan": 100,"debt": 120, "tv": 68,},
-            "25": {"name": "Real Sociedad", "type": 1, "fan": 100,"debt": 120, "tv": 69,},
-            "26": {"name": "Athletic Bilbao", "type": 1, "fan": 100,"debt": 120, "tv": 66,},
-            "27": {"name": "Real Betis", "type": 1, "fan": 100,"debt": 120, "tv": 66,},
-            "28": {"name": "Valencia", "type": 1, "fan": 100,"debt": 120, "tv": 70,},
-            "29": {"name": "Espanyol", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "30": {"name": "Getafe", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "31": {"name": "Celta Vigo", "type": 1, "fan": 100,"debt": 120, "tv": 53,},
-            "32": {"name": "Osasuna", "type": 1, "fan": 100,"debt": 120, "tv": 51,},
-            "33": {"name": "Almeria", "type": 1, "fan": 100,"debt": 120, "tv": 51,},
-            "34": {"name": "Rayo Vallecano", "type": 1, "fan": 100,"debt": 120, "tv": 46,},
-            "35": {"name": "Mallorca", "type": 1, "fan": 100,"debt": 120, "tv": 46,},
-            "36": {"name": "Valladolid", "type": 1, "fan": 100,"debt": 120, "tv": 50,},
-            "37": {"name": "Cadiz", "type": 1, "fan": 100,"debt": 120, "tv": 48,},
-            "38": {"name": "Girona", "type": 1, "fan": 100,"debt": 120, "tv": 49,},
-            "39": {"name": "Elche", "type": 1, "fan": 100,"debt": 120, "tv": 46,},
+            "20": {"name": "Real Madrid", "type": 1, "fan": 1044,"debt": 150, "tv": 161,},
+            "21": {"name": "Barcelona", "type": 1, "fan": 976,"debt": 0, "tv": 160,},
+            "22": {"name": "Atletico de Madrid", "type": 1, "fan": 370,"debt": 80, "tv": 130,},
+            "23": {"name": "Sevilla", "type": 2, "fan": 196,"debt": 70, "tv": 88,},
+            "24": {"name": "Villarreal", "type": 2, "fan": 166,"debt": 60, "tv": 68,},
+            "25": {"name": "Real Sociedad", "type": 2, "fan": 130,"debt": 70, "tv": 69,},
+            "26": {"name": "Athletic Bilbao", "type": 2, "fan": 122,"debt": 60, "tv": 66,},
+            "27": {"name": "Real Betis", "type": 3, "fan": 68,"debt": 50, "tv": 66,},
+            "28": {"name": "Valencia", "type": 3, "fan": 76,"debt": 10, "tv": 70,},
+            "29": {"name": "Espanyol", "type": 3, "fan": 46,"debt": 8, "tv": 55,},
+            "30": {"name": "Getafe", "type": 3, "fan": 45,"debt": 8, "tv": 55,},
+            "31": {"name": "Celta Vigo", "type": 3, "fan": 40,"debt": 8, "tv": 53,},
+            "32": {"name": "Osasuna", "type": 3, "fan": 35,"debt": 7, "tv": 51,},
+            "33": {"name": "Almeria", "type": 3, "fan": 20,"debt": 3, "tv": 51,},
+            "34": {"name": "Rayo Vallecano", "type": 3, "fan": 20,"debt": 3, "tv": 46,},
+            "35": {"name": "Mallorca", "type": 3, "fan": 20,"debt": 3, "tv": 46,},
+            "36": {"name": "Valladolid", "type": 3, "fan": 30,"debt": 5, "tv": 50,},
+            "37": {"name": "Cadiz", "type": 3, "fan": 30,"debt": 5, "tv": 48,},
+            "38": {"name": "Girona", "type": 3, "fan": 20,"debt": 3, "tv": 49,},
+            "39": {"name": "Elche", "type": 3, "fan": 35,"debt": 6, "tv": 46,},
 
             # 40 - 59: Serie A 22/23
-            "40": {"name": "Inter Milan", "type": 1, "fan": 100,"debt": 120, "tv": 87,},
-            "41": {"name": "Napoli", "type": 1, "fan": 100,"debt": 120, "tv": 80,},
-            "42": {"name": "AC Milan", "type": 1, "fan": 100,"debt": 120, "tv": 80,},
-            "43": {"name": "Juventus", "type": 1, "fan": 100,"debt": 120, "tv": 79,},
-            "44": {"name": "Lazio", "type": 1, "fan": 100,"debt": 120, "tv": 71,},
-            "45": {"name": "Roma", "type": 1, "fan": 100,"debt": 120, "tv": 68,},
-            "46": {"name": "Fiorentina", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "47": {"name": "Atalanta", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "48": {"name": "Torino", "type": 1, "fan": 100,"debt": 120, "tv": 49,},
-            "49": {"name": "Bologna", "type": 1, "fan": 100,"debt": 120, "tv": 44,},
-            "50": {"name": "Udinese", "type": 1, "fan": 100,"debt": 120, "tv": 41,},
-            "51": {"name": "Sampdoria", "type": 1, "fan": 100,"debt": 120, "tv": 39,},
-            "52": {"name": "Sassuolo", "type": 1, "fan": 100,"debt": 120, "tv": 39,},
-            "53": {"name": "Lecce", "type": 1, "fan": 100,"debt": 120, "tv": 39,},
-            "54": {"name": "Monza", "type": 1, "fan": 100,"debt": 120, "tv": 34,},
-            "55": {"name": "Hellas Verona", "type": 1, "fan": 100,"debt": 120, "tv": 34,},
-            "56": {"name": "Salernitana", "type": 1, "fan": 100,"debt": 120, "tv": 33,},
-            "57": {"name": "Empoli", "type": 1, "fan": 100,"debt": 120, "tv": 33,},
-            "58": {"name": "Spezia", "type": 1, "fan": 100,"debt": 120, "tv": 30,},
-            "59": {"name": "Cremonese", "type": 1, "fan": 100,"debt": 120, "tv": 29,},
+            "40": {"name": "Inter Milan", "type": 1, "fan": 442,"debt": 60, "tv": 87,},
+            "41": {"name": "Napoli", "type": 1, "fan": 240,"debt": 50, "tv": 80,},
+            "42": {"name": "AC Milan", "type": 1, "fan": 400,"debt": 65, "tv": 80,},
+            "43": {"name": "Juventus", "type": 1, "fan": 642,"debt": 70, "tv": 79,},
+            "44": {"name": "Lazio", "type": 2, "fan": 130,"debt": 40, "tv": 71,},
+            "45": {"name": "Roma", "type": 1, "fan": 276,"debt": 50, "tv": 68,},
+            "46": {"name": "Fiorentina", "type": 2, "fan": 194, "debt": 45, "tv": 55,},
+            "47": {"name": "Atalanta", "type": 2, "fan": 130,"debt": 40, "tv": 55,},
+            "48": {"name": "Torino", "type": 3, "fan": 70,"debt": 20, "tv": 49,},
+            "49": {"name": "Bologna", "type": 3, "fan": 72,"debt": 20, "tv": 44,},
+            "50": {"name": "Udinese", "type": 3, "fan": 74,"debt": 21, "tv": 41,},
+            "51": {"name": "Sampdoria", "type": 3, "fan": 74,"debt": 20, "tv": 39,},
+            "52": {"name": "Sassuolo", "type": 2, "fan": 120,"debt": 30, "tv": 39,},
+            "53": {"name": "Lecce", "type": 3, "fan": 35,"debt": 5, "tv": 39,},
+            "54": {"name": "Monza", "type": 3, "fan": 30,"debt": 0, "tv": 34,},
+            "55": {"name": "Hellas Verona", "type": 2, "fan": 102,"debt": 30, "tv": 34,},
+            "56": {"name": "Salernitana", "type": 3, "fan": 28,"debt": 0, "tv": 33,},
+            "57": {"name": "Empoli", "type": 3, "fan": 76,"debt": 18, "tv": 33,},
+            "58": {"name": "Spezia", "type": 3, "fan": 22,"debt": 0, "tv": 30,},
+            "59": {"name": "Cremonese", "type": 3, "fan": 33,"debt": 0, "tv": 29,},
 
             # 60 - 77: Bundesliga 22/23
-            "60": {"name": "Bayern Munich", "type": 1, "fan": 100,"debt": 120, "tv": 95,},
-            "61": {"name": "Dortmund", "type": 1, "fan": 100,"debt": 120, "tv": 82,},
-            "62": {"name": "RB Leipzig", "type": 1, "fan": 100,"debt": 120, "tv": 80,},
-            "63": {"name": "Bayer Leverkusen", "type": 1, "fan": 100,"debt": 120, "tv": 79,},
-            "64": {"name": "Frankfurt", "type": 1, "fan": 100,"debt": 120, "tv": 77,},
-            "65": {"name": "Monchengladbach", "type": 1, "fan": 100,"debt": 120, "tv": 67,},
-            "66": {"name": "Wolfsburg", "type": 1, "fan": 100,"debt": 120, "tv": 65,},
-            "67": {"name": "Hoffenheim", "type": 1, "fan": 100,"debt": 120, "tv": 63,},
-            "68": {"name": "Freiburg", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "69": {"name": "Union Berlin", "type": 1, "fan": 100,"debt": 120, "tv": 55,},
-            "70": {"name": "Mainz 05", "type": 1, "fan": 100,"debt": 120, "tv": 51,},
-            "71": {"name": "FC Koln", "type": 1, "fan": 100,"debt": 120, "tv": 50,},
-            "72": {"name": "Hertha", "type": 1, "fan": 100,"debt": 120, "tv": 48,},
-            "73": {"name": "Schalke 04", "type": 1, "fan": 100,"debt": 120, "tv": 44,},
-            "74": {"name": "Augsburg", "type": 1, "fan": 100,"debt": 120, "tv": 44,},
-            "75": {"name": "Stuttgart", "type": 1, "fan": 100,"debt": 120, "tv": 41,},
-            "76": {"name": "Werder Bremen", "type": 1, "fan": 100,"debt": 120, "tv": 36,},
-            "77": {"name": "Bochum", "type": 1, "fan": 100,"debt": 120, "tv": 33,},
+            "60": {"name": "Bayern Munich", "type": 1, "fan": 900,"debt": 120, "tv": 95,},
+            "61": {"name": "Dortmund", "type": 1, "fan": 676,"debt": 90, "tv": 82,},
+            "62": {"name": "RB Leipzig", "type": 1, "fan": 580,"debt": 80, "tv": 80,},
+            "63": {"name": "Bayer Leverkusen", "type": 2, "fan": 348,"debt": 45, "tv": 79,},
+            "64": {"name": "Frankfurt", "type": 2, "fan": 342,"debt": 45, "tv": 77,},
+            "65": {"name": "Monchengladbach", "type": 2, "fan": 204,"debt": 28, "tv": 67,},
+            "66": {"name": "Wolfsburg", "type": 2, "fan": 268,"debt": 30, "tv": 65,},
+            "67": {"name": "Hoffenheim", "type": 3, "fan": 116,"debt": 18, "tv": 63,},
+            "68": {"name": "Freiburg", "type": 3, "fan": 120,"debt": 18, "tv": 55,},
+            "69": {"name": "Union Berlin", "type": 3, "fan": 134,"debt": 20, "tv": 55,},
+            "70": {"name": "Mainz 05", "type": 3, "fan": 128,"debt": 20, "tv": 51,},
+            "71": {"name": "FC Koln", "type": 2, "fan": 196,"debt": 25, "tv": 50,},
+            "72": {"name": "Hertha", "type": 2, "fan": 198,"debt": 25, "tv": 48,},
+            "73": {"name": "Schalke 04", "type": 2, "fan": 246,"debt": 30, "tv": 44,},
+            "74": {"name": "Augsburg", "type": 3, "fan": 94,"debt": 12, "tv": 44,},
+            "75": {"name": "Stuttgart", "type": 3, "fan": 198,"debt": 28, "tv": 41,},
+            "76": {"name": "Werder Bremen", "type": 3, "fan": 114,"debt": 20, "tv": 36,},
+            "77": {"name": "Bochum", "type": 3, "fan": 66,"debt": 10, "tv": 33,},
 
             # 78 - 97: Ligue 1 21/22
-            "78": {"name": "PSG", "type": 1, "fan": 100,"debt": 120, "tv": 140,},
-            "79": {"name": "Marseilles", "type": 1, "fan": 100,"debt": 120, "tv": 57,},
-            "80": {"name": "Lyon", "type": 1, "fan": 100,"debt": 120, "tv": 60,},
-            "81": {"name": "LOSC", "type": 1, "fan": 100,"debt": 120, "tv": 90,},
-            "82": {"name": "Monaco", "type": 1, "fan": 100,"debt": 120, "tv": 59,},
-            "83": {"name": "Rennes", "type": 1, "fan": 100,"debt": 120, "tv": 37,},
-            "84": {"name": "Angers", "type": 1, "fan": 100,"debt": 120, "tv": 19,},
-            "85": {"name": "Bordeaux", "type": 1, "fan": 100,"debt": 120, "tv": 21,},
-            "86": {"name": "Brest", "type": 1, "fan": 100,"debt": 120, "tv": 17,},
-            "87": {"name": "Clermont", "type": 1, "fan": 100,"debt": 120, "tv": 16,},
-            "88": {"name": "Lens", "type": 1, "fan": 100,"debt": 120, "tv": 21,},
-            "89": {"name": "Lorient", "type": 1, "fan": 100,"debt": 120, "tv": 16,},
-            "90": {"name": "Metz", "type": 1, "fan": 100,"debt": 120, "tv": 17,},
-            "91": {"name": "Montpellier", "type": 1, "fan": 100,"debt": 120, "tv": 21,},
-            "92": {"name": "Nantes", "type": 1, "fan": 100,"debt": 120, "tv": 25,},
-            "93": {"name": "Nice", "type": 1, "fan": 100,"debt": 120, "tv": 29,},
-            "94": {"name": "Reims", "type": 1, "fan": 100,"debt": 120, "tv": 19,},
-            "95": {"name": "Saint-Etienne", "type": 1, "fan": 100,"debt": 120, "tv": 32,},
-            "96": {"name": "Strasbourg", "type": 1, "fan": 100,"debt": 120, "tv": 24,},
-            "97": {"name": "Troyes", "type": 1, "fan": 100,"debt": 120, "tv": 16,},
+            "78": {"name": "PSG", "type": 1, "fan": 950,"debt": 200, "tv": 140,},
+            "79": {"name": "Marseilles", "type": 1, "fan": 362,"debt": 40, "tv": 57,},
+            "80": {"name": "Lyon", "type": 1, "fan": 360,"debt": 10, "tv": 60,},
+            "81": {"name": "LOSC", "type": 2, "fan": 116,"debt": 40, "tv": 90,},
+            "82": {"name": "Monaco", "type": 1, "fan": 54,"debt": 40, "tv": 59,},
+            "83": {"name": "Rennes", "type": 2, "fan": 92,"debt": 35, "tv": 37,},
+            "84": {"name": "Angers", "type": 1, "fan": 32,"debt": 5, "tv": 19,},
+            "85": {"name": "Bordeaux", "type": 1, "fan": 58,"debt": 10, "tv": 21,},
+            "86": {"name": "Brest", "type": 1, "fan": 54,"debt": 8, "tv": 17,},
+            "87": {"name": "Clermont", "type": 1, "fan": 20,"debt": 0, "tv": 16,},
+            "88": {"name": "Lens", "type": 1, "fan": 52,"debt": 12, "tv": 21,},
+            "89": {"name": "Lorient", "type": 1, "fan": 36,"debt": 8, "tv": 16,},
+            "90": {"name": "Metz", "type": 1, "fan": 38,"debt": 8, "tv": 17,},
+            "91": {"name": "Montpellier", "type": 1, "fan": 36,"debt": 10, "tv": 21,},
+            "92": {"name": "Nantes", "type": 1, "fan": 54,"debt": 15, "tv": 25,},
+            "93": {"name": "Nice", "type": 2, "fan": 98,"debt": 30, "tv": 29,},
+            "94": {"name": "Reims", "type": 1, "fan": 34,"debt": 8, "tv": 19,},
+            "95": {"name": "Saint-Etienne", "type": 1, "fan": 80,"debt": 30, "tv": 32,},
+            "96": {"name": "Strasbourg", "type": 1, "fan": 66,"debt": 20, "tv": 24,},
+            "97": {"name": "Troyes", "type": 1, "fan": 20,"debt": 0, "tv": 16,},
         
         }
         
@@ -235,6 +235,20 @@ class MyModel(mesa.Model):
                 club.tv_rights = club_data["tv"]
                 club.set_revenue()
                 club.set_spending()
+
+                # Determine the club's league based on its key in league_data
+                if 0 <= keys <= 19:
+                    club.league = "Premier League"
+                elif 20 <= keys <= 39:
+                    club.league = "La Liga"
+                elif 40 <= keys <= 59:
+                    club.league = "Serie A"
+                elif 60 <= keys <= 77:
+                    club.league = "Bundesliga"
+                elif 78 <= keys <= 97:
+                    club.league = "Ligue 1"
+
+
                 self.schedule.add(club)
                 self.clubs.append(club)
 
@@ -258,16 +272,16 @@ class MyModel(mesa.Model):
         for i in range(P):
             self.highest_unique_id += 1
             player_id = self.highest_unique_id
-            player = Players(player_id, self, age = random.randint(18, 39), contract = "Signed", reputation = random.randint(1, 10), 
+            player = Players(player_id, self, age = random.randint(18, 36), contract = "Signed", reputation = random.randint(1, 10), 
                              skill = random.randint(1, 10))
             player.set_potential()
-            player.set_value()
+
             self.schedule.add(player)
 
             # Link players to agents evenly
             max_a = self.num_players / self.num_agents
-            # available_agents = [a for a in self.pool if len(a.clients) < max_a]
-            available_agents = [a for a in self.pool]
+            available_agents = [a for a in self.pool if len(a.clients) < max_a]
+            # available_agents = [a for a in self.pool]
 
             if available_agents:
                 choice = random.choice(available_agents)
@@ -285,6 +299,7 @@ class MyModel(mesa.Model):
                 print("No available clubs to join for player", player_id)
 
             player.set_salary()
+            player.set_value()
 
             # Add players to a random grid cell
             x = self.random.randrange(self.grid.width)
@@ -604,12 +619,7 @@ class MyModel(mesa.Model):
         
     # Search for players with higher salary or value than current clients
     def agent_incentives(self):
-        # new_clients = self.pool.copy()  # Create a copy of current clients
-        # num_players = len([player for player in self.model.schedule.agents if isinstance(player, Players)])
-        # num_agents = len([F_agent for F_agent in self.model.schedule.agents if isinstance(F_agent, F_Agents)])
         available_players = [player for player in self.schedule.agents if isinstance(player, Players)]
-
-        max_a = self.num_players / self.num_agents  # Maximum number of clients per agent
 
         for agent in self.pool:
             if agent != self:
@@ -618,26 +628,21 @@ class MyModel(mesa.Model):
                 signing_done = False
 
                 for player in available_players:
-                    if player.F_agent != agent:
+                    if player.F_agent != agent and len(player.F_agent.clients) > 1:
                         if not signing_done:
-                            if player.salary > min_salary_client.salary:
-                                # Replace the client with the higher salary player
-                                # player.F_agent.clients.remove(player)
-                                # agent.clients.append(player)
-                                self.signing(player, agent)
-                                # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
-                                signing_done = True  # Set flag to True
-                                available_players.remove(player)
-                                # if len(new_clients) > max_a:
-                                #     new_clients.remove(min_salary_client)
-                            elif player.value > min_value_client.value:
-                                # Replace the client with the higher value player
-                                print(player.unique_id)
-                                # player.F_agent.clients.remove(player)
-                                # agent.clients.append(player)
-                                self.signing(player, agent)
-                                # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
-                                signing_done = True  # Set flag to True
-                                available_players.remove(player)
-                                # if len(new_clients) > max_a:
-                                #     new_clients.remove(min_value_client)
+                            if agent.n_skills > player.F_agent.n_skills:
+                                if player.salary > min_salary_client.salary:
+                                    self.signing(player, agent)
+                                    # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
+                                    signing_done = True  # Set flag to True
+                                    available_players.remove(player)
+
+                                elif player.value > min_value_client.value:
+                                    # Replace the client with the higher value player
+                                    # print(player.unique_id)
+                                    self.signing(player, agent)
+                                    # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
+                                    signing_done = True  # Set flag to True
+                                    available_players.remove(player)
+
+

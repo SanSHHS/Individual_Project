@@ -16,15 +16,15 @@ def set_club_type(club, type):
     """
     if type == 1:
         # club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(70, 100)
+        club.fans = random.randint(600, 1000)
         club.allowed_debt = random.randint(140, 200)
     if type == 2:
         # club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(30, 70)
+        club.fans = random.randint(200, 600)
         club.allowed_debt = random.randint(60, 140)
     if type == 3:
         # club.objectives = random.randint(10, 1000)
-        club.fans = random.randint(1, 30)
+        club.fans = random.randint(1, 200)
         club.allowed_debt = random.randint(0, 60)
 
 
@@ -44,6 +44,7 @@ class Club(Agent):
         self.interested_players = []
         self.name = ""
         self.tv_rights = 0
+        self.league = ""
         set_club_type(self, type)
 
 
@@ -142,7 +143,8 @@ class Club(Agent):
         squad_list = ', '.join(squad_id)
         print("Club " + self.name + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
               str(self.team_level()) + ". The revenue is " + str(self.revenue) + ". The number of fan is " + str(self.fans) + ". Spending is " + 
-              str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ". My tv right is: " + str(self.tv_rights))
+              str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ". My tv right is: " + str(self.tv_rights)
+              + ". My league is: " + self.league)
 
 class F_Agents(Agent):
     def __init__(self, unique_id, model, cut, network, n_skills):
@@ -165,7 +167,7 @@ class F_Agents(Agent):
 
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
-        # print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
+        print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
         # print("Agent " + str(self.unique_id) + " money is " + str(self.money) + ".")
 
 class Players(Agent):
@@ -186,14 +188,14 @@ class Players(Agent):
     def set_salary(self):
         age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
 
-        self.salary = round(self.reputation * self.skill * age_factor * self.F_agent.n_skills, 2)
+        self.salary = round(self.reputation / 2 * self.skill * age_factor * self.F_agent.n_skills * 0.15, 2)
         self.F_agent.earn(self.salary)
 
     # Set the players' value
     def set_value(self):
         age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
 
-        self.value = round(self.reputation * self.skill * self.potential * age_factor * self.F_agent.n_skills, 2)
+        self.value = round(self.reputation / 2 * self.skill * self.potential * age_factor * self.F_agent.n_skills * 0.02, 2)
 
     # Link players with agents
     def link_agent(self, F_agents):
