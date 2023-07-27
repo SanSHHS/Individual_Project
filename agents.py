@@ -43,6 +43,7 @@ class Club(Agent):
         self.deficit = 0
         self.interested_players = []
         self.name = ""
+        self.tv_rights = 0
         set_club_type(self, type)
 
 
@@ -51,7 +52,7 @@ class Club(Agent):
 
     def set_revenue(self):
         """For small clubs its 2 - 60, medium clubs 60 - 140, big club 140 - 200"""
-        self.revenue = 0.5 * self.fans
+        self.revenue = 0.5 * self.fans + self.tv_rights
 
     def set_spending(self):
         self.spending = 0
@@ -141,7 +142,7 @@ class Club(Agent):
         squad_list = ', '.join(squad_id)
         print("Club " + self.name + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
               str(self.team_level()) + ". The revenue is " + str(self.revenue) + ". The number of fan is " + str(self.fans) + ". Spending is " + 
-              str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ".")
+              str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ". My tv right is: " + str(self.tv_rights))
 
 class F_Agents(Agent):
     def __init__(self, unique_id, model, cut, network, n_skills):
@@ -183,12 +184,16 @@ class Players(Agent):
 
     # Set the players' salary
     def set_salary(self):
-        self.salary = round(self.reputation * self.skill / self.age * self.F_agent.n_skills, 2)
+        age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
+
+        self.salary = round(self.reputation * self.skill * age_factor * self.F_agent.n_skills, 2)
         self.F_agent.earn(self.salary)
 
     # Set the players' value
     def set_value(self):
-        self.value = round(self.reputation * self.skill * self.potential / self.age, 2)
+        age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
+
+        self.value = round(self.reputation * self.skill * self.potential * age_factor * self.F_agent.n_skills, 2)
 
     # Link players with agents
     def link_agent(self, F_agents):
