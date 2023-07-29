@@ -141,10 +141,10 @@ class Club(Agent):
 
         squad_id = [str(player.unique_id) for player in self.team]
         squad_list = ', '.join(squad_id)
-        print("Club " + self.name + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
-              str(self.team_level()) + ". The revenue is " + str(self.revenue) + ". The number of fan is " + str(self.fans) + ". Spending is " + 
-              str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ". My tv right is: " + str(self.tv_rights)
-              + ". My league is: " + self.league)
+        # print("Club " + self.name + ". My type is: " + str(self.type) + ". My team has player number: " + squad_list + ". The average level is: " + 
+        #       str(self.team_level()) + ". The revenue is " + str(self.revenue) + ". The number of fan is " + str(self.fans) + ". Spending is " + 
+        #       str(self.spending) + ". The allowed debt is " + str(self.allowed_debt) + ". The budget is " + str(self.budget) + ". My tv right is: " + str(self.tv_rights)
+        #       + ". My league is: " + self.league)
 
 class F_Agents(Agent):
     def __init__(self, unique_id, model, cut, network, n_skills):
@@ -167,7 +167,7 @@ class F_Agents(Agent):
 
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
-        print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
+        # print("Agent " + str(self.unique_id) + " My clients are: " + client_list + ". My skill is " + str(self.n_skills) + ". ")
         # print("Agent " + str(self.unique_id) + " money is " + str(self.money) + ".")
 
 class Players(Agent):

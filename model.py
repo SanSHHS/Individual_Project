@@ -9,7 +9,6 @@ from mesa.datacollection import DataCollector
 
 
 
-
 class MyModel(mesa.Model):
     """A model with some number of agents."""
 
@@ -22,6 +21,7 @@ class MyModel(mesa.Model):
         self.is_initial_step = True
         self.clubs = []
         self.pool = []
+        self.club_id = 0
         self.highest_unique_id = C + F
         self.team_skill_levels = {}
         self.second_team_skill_levels = {}
@@ -29,10 +29,12 @@ class MyModel(mesa.Model):
         self.market = []
         self.FFP = FFP
         self.winner_id = None
+        self.winner_name = None
         self.league_range = league_range
+        self.season = 0
         self.running = True
         
-        # Calibration
+        # Calibration on top5 league, 0 - 97, 98 clubs
         self.league_data = {
             # 0 - 19 : Premier League 21/22 adjusted to euro
             "0": {"name": "Manchester City", "type": 1, "fan": 840, "debt": 199,  "tv": 179,},
@@ -45,9 +47,9 @@ class MyModel(mesa.Model):
             "7": {"name": "Leicester", "type": 2, "fan": 172,"debt": 60, "tv": 151,},
             "8": {"name": "Leeds", "type": 2, "fan": 148,"debt": 60, "tv": 134,},
             "9": {"name": "Everton", "type": 2, "fan": 128,"debt": 60, "tv": 137,},
-            "10": {"name": "Newcastle", "type": 2, "fan": 106,"debt": 80, "tv": 148,},
-            "11": {"name": "Brighton", "type": 2, "fan": 96,"debt": 60, "tv": 147,},
-            "12": {"name": "Aston Villa", "type": 2, "fan": 98,"debt": 40, "tv": 140,},
+            "10": {"name": "Newcastle", "type": 2, "fan": 206,"debt": 80, "tv": 148,},
+            "11": {"name": "Brighton", "type": 2, "fan": 126,"debt": 60, "tv": 147,},
+            "12": {"name": "Aston Villa", "type": 2, "fan": 138,"debt": 40, "tv": 140,},
             "13": {"name": "Wolves", "type": 3, "fan": 82,"debt": 0, "tv": 146,},
             "14": {"name": "Crystal Palace", "type": 3, "fan": 80,"debt": 0, "tv": 140,},
             "15": {"name": "Southampton", "type": 3, "fan": 80,"debt": 0, "tv": 130,},
@@ -100,23 +102,23 @@ class MyModel(mesa.Model):
             "58": {"name": "Spezia", "type": 3, "fan": 22,"debt": 0, "tv": 30,},
             "59": {"name": "Cremonese", "type": 3, "fan": 33,"debt": 0, "tv": 29,},
 
-            # 60 - 77: Bundesliga 22/23
+            # 60 - 77: Bundesliga 22/23 1065 tv
             "60": {"name": "Bayern Munich", "type": 1, "fan": 900,"debt": 120, "tv": 95,},
             "61": {"name": "Dortmund", "type": 1, "fan": 676,"debt": 90, "tv": 82,},
-            "62": {"name": "RB Leipzig", "type": 1, "fan": 580,"debt": 80, "tv": 80,},
-            "63": {"name": "Bayer Leverkusen", "type": 2, "fan": 348,"debt": 45, "tv": 79,},
-            "64": {"name": "Frankfurt", "type": 2, "fan": 342,"debt": 45, "tv": 77,},
-            "65": {"name": "Monchengladbach", "type": 2, "fan": 204,"debt": 28, "tv": 67,},
-            "66": {"name": "Wolfsburg", "type": 2, "fan": 268,"debt": 30, "tv": 65,},
+            "62": {"name": "RB Leipzig", "type": 1, "fan": 380,"debt": 80, "tv": 80,},
+            "63": {"name": "Bayer Leverkusen", "type": 2, "fan": 248,"debt": 45, "tv": 79,},
+            "64": {"name": "Frankfurt", "type": 2, "fan": 242,"debt": 45, "tv": 77,},
+            "65": {"name": "Monchengladbach", "type": 2, "fan": 124,"debt": 28, "tv": 67,},
+            "66": {"name": "Wolfsburg", "type": 2, "fan": 168,"debt": 30, "tv": 65,},
             "67": {"name": "Hoffenheim", "type": 3, "fan": 116,"debt": 18, "tv": 63,},
-            "68": {"name": "Freiburg", "type": 3, "fan": 120,"debt": 18, "tv": 55,},
-            "69": {"name": "Union Berlin", "type": 3, "fan": 134,"debt": 20, "tv": 55,},
-            "70": {"name": "Mainz 05", "type": 3, "fan": 128,"debt": 20, "tv": 51,},
-            "71": {"name": "FC Koln", "type": 2, "fan": 196,"debt": 25, "tv": 50,},
-            "72": {"name": "Hertha", "type": 2, "fan": 198,"debt": 25, "tv": 48,},
-            "73": {"name": "Schalke 04", "type": 2, "fan": 246,"debt": 30, "tv": 44,},
+            "68": {"name": "Freiburg", "type": 2, "fan": 120,"debt": 18, "tv": 55,},
+            "69": {"name": "Union Berlin", "type": 2, "fan": 134,"debt": 20, "tv": 55,},
+            "70": {"name": "Mainz 05", "type": 2, "fan": 128,"debt": 20, "tv": 51,},
+            "71": {"name": "FC Koln", "type": 3, "fan": 96,"debt": 25, "tv": 50,},
+            "72": {"name": "Hertha", "type": 3, "fan": 98,"debt": 25, "tv": 48,},
+            "73": {"name": "Schalke 04", "type": 2, "fan": 146,"debt": 30, "tv": 44,},
             "74": {"name": "Augsburg", "type": 3, "fan": 94,"debt": 12, "tv": 44,},
-            "75": {"name": "Stuttgart", "type": 3, "fan": 198,"debt": 28, "tv": 41,},
+            "75": {"name": "Stuttgart", "type": 3, "fan": 98,"debt": 28, "tv": 41,},
             "76": {"name": "Werder Bremen", "type": 3, "fan": 114,"debt": 20, "tv": 36,},
             "77": {"name": "Bochum", "type": 3, "fan": 66,"debt": 10, "tv": 33,},
 
@@ -147,7 +149,12 @@ class MyModel(mesa.Model):
         self.datacollector = DataCollector(
             model_reporters={
                 "Winner Club": self.get_winner,
-            }
+                "Season": lambda model: model.season,
+                "Average revenue by league": self.calculate_avg_revenue_by_league,
+            },
+            agent_reporters={
+                "Club Revenue": lambda agent: agent.revenue if isinstance(agent, Club) else None,
+            },
         )
 
         # Creating agents
@@ -156,22 +163,12 @@ class MyModel(mesa.Model):
         self.create_players(P)
 
     def step(self):
-        # Collect data at each step
-        # datacollector.collect(self)
 
-        """Advance the model by one step."""
-        # print("Step:", self.schedule.steps)
-        # First step 
         if self.is_initial_step:
             print("Step: 0")
             self.is_initial_step = False
         self.schedule.step()
-        # self.retire_players()
 
-        # First step 
-        # if self.is_initial_step:
-        #     print("First Step")
-        #     self.is_initial_step = False
         print("\nStep:", self.schedule.steps)
 
         if self.schedule.steps != 0:
@@ -185,18 +182,13 @@ class MyModel(mesa.Model):
             self.retire_players()
 
             # self.datacollector.collect(self)
-
-
+            
         if self.schedule.steps != 0 and self.schedule.steps % 2 == 0:
             self.average_skill_levels()
             self.print_average_skill_levels()
             print("Transfer market opens")
             self.open_market()
             self.club_incentives()
-
-            
-        # self.schedule.step()
-        # self.retire_players()
 
         player_count = self.count_players()
         # print("Number of players: ", player_count)
@@ -212,22 +204,24 @@ class MyModel(mesa.Model):
             # self.print_average_skill_levels()
             # self.print_club_spending()
 
-        # player_count = self.count_players()
-        # print("Number of players: ", player_count)
-
         print("\n")
         # Collect data at each step
-        self.datacollector.collect(self)
+        self.datacollector.collect(self)        
 
 
 
     # Functions
     def create_clubs(self, C):
-        start, end = self.league_range
-        if C == end - start + 1:
-            for i, keys in enumerate(range(start, end+1)):
+        # Handle single league range
+        if not isinstance(self.league_range, list):
+            self.league_range = [self.league_range]
+
+        for league_range in self.league_range:
+            start, end = league_range
+            for keys in range(start, end+1):
                 club_data = self.league_data[str(keys)]
-                club = Club(i, self, type = random.randint(1, 3))
+                club = Club(self.club_id, self, type = random.randint(1, 3))
+                self.club_id += 1
                 club.name = club_data["name"]
                 club.type = club_data["type"]
                 club.fans = club_data["fan"]
@@ -369,7 +363,7 @@ class MyModel(mesa.Model):
     def winner(self):
         max_key = max(self.final_results, key = lambda x: self.final_results[x])
         winning_club = None
-        season = round(self.schedule.steps / 4)
+        self.season = round(self.schedule.steps / 4)
         
         for club in self.clubs:
             if club.unique_id == max_key:
@@ -377,8 +371,9 @@ class MyModel(mesa.Model):
                 break
 
         if winning_club is not None:
-            print("The winner of season " + str(season) + " is " + str(winning_club.name) + ". \n")
+            print("The winner of season " + str(self.season) + " is " + str(winning_club.name) + ". \n")
             self.winner_id = max_key
+            self.winner_name = winning_club.name
 
             for player in winning_club.team:
                 player.higher_rep()
@@ -391,9 +386,6 @@ class MyModel(mesa.Model):
         else:
             print("No winning team.")
 
-    def get_winner(self):
-        return self.winner_id
-
     # Print club spending
     def print_club_spending(self):
         for club in self.clubs:
@@ -405,7 +397,7 @@ class MyModel(mesa.Model):
 
     # Player transfer
     def transfer(self, player, club):
-        print("Club", club.unique_id, "bought player", player.unique_id)
+        # print("Club", club.unique_id, "bought player", player.unique_id)
         if player.club is not None:
             # Change attributes following the transfer
             player.club.revenue_from_sales += player.value
@@ -417,9 +409,6 @@ class MyModel(mesa.Model):
         club.budget -= player.value
         club.set_spending()
 
-        # Avoid same player transfers multiple times in the same window
-        # self.market.remove(player)
-
     # Player transfer
     def bid(self, player, club, offer):
         print("Club", club.unique_id, "bought player", player.unique_id)
@@ -429,7 +418,7 @@ class MyModel(mesa.Model):
             player.club.spending -= player.salary
             player.club.team.remove(player)
 
-        player.F_agent.earn(player.value)
+        player.F_agent.earn(offer)
         player.join_club(club)
         club.budget -= offer
         club.set_spending()
@@ -437,7 +426,7 @@ class MyModel(mesa.Model):
     # Add a method to initiate a bidding war
     def initiate_bidding_war(self, player, interested_clubs):
         best_offer = None
-        best_offer_value = 0
+        best_offer_value = player.value
 
         for club in interested_clubs:
             # Create a bidding logic to determine the value of the offer
@@ -452,19 +441,22 @@ class MyModel(mesa.Model):
 
         if best_offer is not None:
             # The player accepts the best offer and joins the club
-            print("Player", player.unique_id, "accepts the offer from Club", best_offer.unique_id)
+            # print("Player", player.unique_id, "accepts the offer from Club", best_offer.unique_id)
             if player.club is not None:
-                    if len(player.club.team) > MIN_SQUAD_SIZE:
-                        self.bid(player, best_offer, best_offer_value)
-                    else:
-                        print("Seller club does not have enough player.")
+                if len(player.club.team) > MIN_SQUAD_SIZE:
+                    self.bid(player, best_offer, best_offer_value)
+                else:
+                    print("Seller club does not have enough player.")
+            else:
+                self.bid(player, best_offer, best_offer_value)
+            
 
             # Remove the player from the interested list of other clubs
             for club in interested_clubs:
                 club.interested_player.remove(player)
             return True
         else:
-            print("Player", player.unique_id, "rejects all offers.")
+            # print("Player", player.unique_id, "rejects all offers.")
             return False
 
 
@@ -493,15 +485,12 @@ class MyModel(mesa.Model):
 
                     target_list.sort(key=lambda player: (player.skill, player.contract == "Free agent"), reverse=True)
 
-
                 if club.type == 2:
                     
                     for player in self.market:
                         if player.club != club and player.value <= club.budget - player.salary and player.skill > min_player.skill and player.potential > min_player.potential:
                             target_list.append(player)
-
                     target_list.sort(key=lambda player: (player.skill, player.potential, player.contract == "Free agent"), reverse=True)
-
 
                 if club.type == 3:
                     for player in self.market:
@@ -532,6 +521,8 @@ class MyModel(mesa.Model):
                         self.transfer(player, interested_clubs[0])
                     else:
                         print("Seller club does not have enough player.")
+                else:
+                    self.transfer(player, interested_clubs[0])
 
         
     # Use to find buyers for a specific player on sell
@@ -633,16 +624,31 @@ class MyModel(mesa.Model):
                             if agent.n_skills > player.F_agent.n_skills:
                                 if player.salary > min_salary_client.salary:
                                     self.signing(player, agent)
-                                    # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
                                     signing_done = True  # Set flag to True
                                     available_players.remove(player)
 
                                 elif player.value > min_value_client.value:
                                     # Replace the client with the higher value player
-                                    # print(player.unique_id)
                                     self.signing(player, agent)
-                                    # print("Agent " + str(agent.unique_id) + " signs player " + str(player.unique_id))
                                     signing_done = True  # Set flag to True
                                     available_players.remove(player)
 
-
+    # Data Collector methods
+    def get_winner(self):
+        return self.winner_name
+    
+    def calculate_avg_revenue_by_league(self):
+        league_revenue = {}
+        for club in self.clubs:
+            league = club.league
+            revenue = club.revenue
+            if league in league_revenue:
+                league_revenue[league].append(revenue)
+            else:
+                league_revenue[league] = [revenue]
+        
+        avg_revenue_by_league = {}
+        for league, revenues in league_revenue.items():
+            avg_revenue_by_league[league] = round(sum(revenues) / len(revenues),2)
+        
+        return avg_revenue_by_league
