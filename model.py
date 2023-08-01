@@ -151,9 +151,11 @@ class MyModel(mesa.Model):
                 "Winner Club": self.get_winner,
                 "Season": lambda model: model.season,
                 "Average revenue by league": self.calculate_avg_revenue_by_league,
+                # "Team size": self.team_size,
             },
             agent_reporters={
                 "Club Revenue": lambda agent: agent.revenue if isinstance(agent, Club) else None,
+                "Team size": lambda agent: len(agent.team) if isinstance(agent, Club) else None,
             },
         )
 
@@ -198,11 +200,13 @@ class MyModel(mesa.Model):
             self.create_players(self.num_players - player_count)
 
         if self.schedule.steps != 1 and self.schedule.steps % 2 == 1:
-
             print("Close")
             # self.average_skill_levels()
             # self.print_average_skill_levels()
             # self.print_club_spending()
+
+        if self.FFP and self.schedule.steps % 12 == 0:
+            self.sanctions
 
         print("\n")
         # Collect data at each step
@@ -253,7 +257,7 @@ class MyModel(mesa.Model):
 
     def create_agents(self, F):
         for i in range(F):
-            f_agent = F_Agents(self.num_clubs + i, self, cut = random.randint(3, 10), network = "Signed", n_skills = random.randint(1, 10))
+            f_agent = F_Agents(self.num_clubs + i, self, cut = random.randint(3, 10), n_skills = random.randint(1, 10))
             self.schedule.add(f_agent)
             self.pool.append(f_agent)
 
@@ -325,6 +329,15 @@ class MyModel(mesa.Model):
             if isinstance(agent, Players):
                 count += 1
         return count
+    
+    def sanctions(self):
+        assess = 0
+        for club in self.clubs:
+            assess = club.check_ffp()
+            if assess < -5:
+                club.warning += 1
+            else:
+                club.warning = 0
 
     # Compare team levels before the half season transfer martket opens
     def average_skill_levels(self):
@@ -403,6 +416,7 @@ class MyModel(mesa.Model):
             player.club.revenue_from_sales += player.value
             player.club.spending -= player.salary
             player.club.team.remove(player)
+            player.club.set_budget()
 
         player.F_agent.earn(player.value)
         player.join_club(club)
@@ -417,6 +431,7 @@ class MyModel(mesa.Model):
             player.club.revenue_from_sales += offer
             player.club.spending -= player.salary
             player.club.team.remove(player)
+            player.club.set_budget()
 
         player.F_agent.earn(offer)
         player.join_club(club)
@@ -605,8 +620,10 @@ class MyModel(mesa.Model):
 
     def signing(self, player, agent):
         # print("Before signing - player:", player)
+        player.F_agent.money += player.value/2
         player.F_agent.clients.remove(player)
         player.link_agent(agent)
+        agent.money -= player.value/2
         
     # Search for players with higher salary or value than current clients
     def agent_incentives(self):
@@ -619,7 +636,7 @@ class MyModel(mesa.Model):
                 signing_done = False
 
                 for player in available_players:
-                    if player.F_agent != agent and len(player.F_agent.clients) > 1:
+                    if player.F_agent != agent and len(player.F_agent.clients) > 1 and agent.money >= player.value / 2:
                         if not signing_done:
                             if agent.n_skills > player.F_agent.n_skills:
                                 if player.salary > min_salary_client.salary:
@@ -652,3 +669,7 @@ class MyModel(mesa.Model):
             avg_revenue_by_league[league] = round(sum(revenues) / len(revenues),2)
         
         return avg_revenue_by_league
+    
+    def team_size(self):
+        team_sizes = {club.unique_id: len(club.team) for club in self.clubs}
+        return team_sizes
