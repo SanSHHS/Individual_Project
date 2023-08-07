@@ -49,7 +49,6 @@ class Club(Agent):
         self.warning = 0
         set_club_type(self, type)
 
-
     def add_player(self, player):
         self.team.append(player)
 
@@ -70,14 +69,14 @@ class Club(Agent):
 
     def set_budget(self):
         if not self.model.FFP:
-            print("No FFP!")
+            # print("No FFP!")
             self.set_deficit()
             diff = self.allowed_debt - self.deficit
             self.budget = round(self.revenue - self.spending + self.revenue_from_sales + diff, 2)
             self.revenue_from_sales = 0
         
         else:
-            print("FFP Budget!")
+            # print("FFP Budget!")
             self.budget = round(self.revenue - self.spending + self.revenue_from_sales, 2)
             self.revenue_from_sales = 0
 
@@ -89,12 +88,12 @@ class Club(Agent):
 
             total = sum(player.skill for player in self.team)
             average = round(total / len(self.team), 2)
-            if self.warning == 2:
+            if self.warning >= 2:
                 return average * depth_factor - 2
             else:
                 return average * depth_factor
-        else:
-            print("No players in the team yet")
+        # else:
+            # print("No players in the team yet")
 
     def wins(self):
         self.fans = round(self.fans * 1.2)
@@ -104,22 +103,22 @@ class Club(Agent):
             if self.team:
                 # Find the worst skilled player in the team
                 min_player = min(self.team, key=lambda player: player.skill)
-                print("Min", min_player.unique_id)
+                # print("Min", min_player.unique_id)
 
                 # Try to find a potential buyer club
                 buyer = self.model.sell_incentives(min_player)
                 if buyer:
                     buyer_club, target_player = buyer
-                    print("Club", self.unique_id, "sold player ", min_player.unique_id)
+                    # print("Club", self.unique_id, "sold player ", min_player.unique_id)
                     self.model.transfer(target_player, buyer_club)
 
                 else:
-                    print("Club", self.unique_id, "could not find a buyer for the worst skilled player.")
+                    # print("Club", self.unique_id, "could not find a buyer for the worst skilled player.")
                     self.release_player(min_player)
-            else:
-                print("Club", self.unique_id, "has no players in the team.")
+            # else:
+            #     print("Club", self.unique_id, "has no players in the team.")
 
-        print("Club", self.unique_id, "does not need to sell a player.")
+        # print("Club", self.unique_id, "does not need to sell a player.")
 
 
     def release_player(self, min_player):
@@ -131,9 +130,9 @@ class Club(Agent):
             self.set_budget
 
             # Print a message indicating the player has been released
-            print("Club", self.unique_id, "released player", min_player.unique_id)
-        else:
-            print("Release gone wrong Club", self.unique_id, "does not have player", min_player.unique_id)
+            # print("Club", self.unique_id, "released player", min_player.unique_id)
+        # else:
+            # print("Release gone wrong Club", self.unique_id, "does not have player", min_player.unique_id)
         min_player.join_club(None)
 
     def check_ffp(self):
@@ -148,7 +147,7 @@ class Club(Agent):
 
         if self.model.schedule.steps % 2 == 0:
             self.set_budget()
-            print("New Budget")
+            # print("New Budget")
 
         if self.model.schedule.steps != 0 and self.model.schedule.steps % 2 == 0:
             self.sell_player()
@@ -188,13 +187,12 @@ class F_Agents(Agent):
         if self.money >= price:
             self.money -= price
             self.n_skills += 1
-            print("Agent", self.unique_id, "increased n_skills by 1 for a price of", price)
-        else:
-            print("Agent", self.unique_id, "doesn't have enough money to increase n_skills.")
+            # print("Agent", self.unique_id, "increased n_skills by 1 for a price of", price)
+        # else:
+            # print("Agent", self.unique_id, "doesn't have enough money to increase n_skills.")
 
 
     def step(self):
-
         client_id = [str(player.unique_id) for player in self.clients]
         client_list = ', '.join(client_id)
         self.qualifications()
@@ -217,16 +215,16 @@ class Players(Agent):
 
     # Set the players' salary
     def set_salary(self):
-        age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
+        age_factor = max(0.1, 1 - abs(26 - self.age) / 8)
 
         self.salary = round(self.reputation / 2 * self.skill * age_factor * self.F_agent.n_skills * 0.15, 2)
         self.F_agent.earn(self.salary)
 
     # Set the players' value
     def set_value(self):
-        age_factor = max(0.1, 1 - abs(26 - self.age) / 10)
+        age_factor = max(0.1, 1 - abs(26 - self.age) / 8)
 
-        self.value = round(self.reputation / 2 * self.skill * self.potential * age_factor * self.F_agent.n_skills * 0.02, 2)
+        self.value = round(self.reputation / 2 * self.skill * self.potential * age_factor * self.F_agent.n_skills * 0.022, 3)
 
     # Link players with agents
     def link_agent(self, F_agents):

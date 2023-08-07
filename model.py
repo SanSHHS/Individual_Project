@@ -12,11 +12,11 @@ from mesa.datacollection import DataCollector
 class MyModel(mesa.Model):
     """A model with some number of agents."""
 
-    def __init__(self, C, F, P, width, height, league_range, FFP = False):
+    def __init__(self, C, F, P, league_range = None, FFP = False):
         self.num_clubs = C
         self.num_agents = F
         self.num_players = P
-        self.grid = MultiGrid(width, height, True)
+        # self.grid = MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivationByType(self)
         self.is_initial_step = True
         self.clubs = []
@@ -38,9 +38,9 @@ class MyModel(mesa.Model):
         self.league_data = {
             # 0 - 19 : Premier League 21/22 adjusted to euro
             "0": {"name": "Manchester City", "type": 1, "fan": 840, "debt": 199,  "tv": 179,},
-            "1": {"name": "Liverpool", "type": 1, "fan": 850,"debt": 169, "tv": 178,},
-            "2": {"name": "Manchester United", "type": 1, "fan": 1000,"debt": 94, "tv": 167,},
-            "3": {"name": "Chelsea", "type": 1, "fan": 860,"debt": 51, "tv": 171,},
+            "1": {"name": "Liverpool", "type": 1, "fan": 850,"debt": 149, "tv": 178,},
+            "2": {"name": "Manchester United", "type": 1, "fan": 1000,"debt": 150, "tv": 167,},
+            "3": {"name": "Chelsea", "type": 1, "fan": 860,"debt": 181, "tv": 171,},
             "4": {"name": "Tottenham", "type": 1, "fan": 600,"debt": 143, "tv": 171,},
             "5": {"name": "Arsenal", "type": 1, "fan": 666,"debt": 35, "tv": 171,},
             "6": {"name": "West Ham", "type": 2, "fan": 236,"debt": 100, "tv": 160,},
@@ -59,15 +59,15 @@ class MyModel(mesa.Model):
             "19": {"name": "Burnley", "type": 3, "fan": 40,"debt": 0, "tv": 123,},
 
             # 20 - 39: La Liga 21/22 tv rights, 
-            "20": {"name": "Real Madrid", "type": 1, "fan": 1044,"debt": 150, "tv": 161,},
-            "21": {"name": "Barcelona", "type": 1, "fan": 976,"debt": 0, "tv": 160,},
-            "22": {"name": "Atletico de Madrid", "type": 1, "fan": 370,"debt": 80, "tv": 130,},
-            "23": {"name": "Sevilla", "type": 2, "fan": 196,"debt": 70, "tv": 88,},
-            "24": {"name": "Villarreal", "type": 2, "fan": 166,"debt": 60, "tv": 68,},
-            "25": {"name": "Real Sociedad", "type": 2, "fan": 130,"debt": 70, "tv": 69,},
-            "26": {"name": "Athletic Bilbao", "type": 2, "fan": 122,"debt": 60, "tv": 66,},
-            "27": {"name": "Real Betis", "type": 3, "fan": 68,"debt": 50, "tv": 66,},
-            "28": {"name": "Valencia", "type": 3, "fan": 76,"debt": 10, "tv": 70,},
+            "20": {"name": "Real Madrid", "type": 1, "fan": 1106,"debt": 150, "tv": 161,},
+            "21": {"name": "Barcelona", "type": 1, "fan": 956,"debt": 0, "tv": 160,},
+            "22": {"name": "Atletico de Madrid", "type": 1, "fan": 484,"debt": 80, "tv": 130,},
+            "23": {"name": "Sevilla", "type": 2, "fan": 290,"debt": 70, "tv": 88,},
+            "24": {"name": "Villarreal", "type": 2, "fan": 120,"debt": 60, "tv": 68,},
+            "25": {"name": "Real Sociedad", "type": 2, "fan": 56,"debt": 70, "tv": 69,},
+            "26": {"name": "Athletic Bilbao", "type": 2, "fan": 86,"debt": 60, "tv": 66,},
+            "27": {"name": "Real Betis", "type": 2, "fan": 68,"debt": 50, "tv": 66,},
+            "28": {"name": "Valencia", "type": 2, "fan": 76,"debt": 10, "tv": 70,},
             "29": {"name": "Espanyol", "type": 3, "fan": 46,"debt": 8, "tv": 55,},
             "30": {"name": "Getafe", "type": 3, "fan": 45,"debt": 8, "tv": 55,},
             "31": {"name": "Celta Vigo", "type": 3, "fan": 40,"debt": 8, "tv": 53,},
@@ -82,11 +82,11 @@ class MyModel(mesa.Model):
 
             # 40 - 59: Serie A 22/23
             "40": {"name": "Inter Milan", "type": 1, "fan": 442,"debt": 60, "tv": 87,},
-            "41": {"name": "Napoli", "type": 1, "fan": 240,"debt": 50, "tv": 80,},
+            "41": {"name": "Napoli", "type": 2, "fan": 240,"debt": 50, "tv": 80,},
             "42": {"name": "AC Milan", "type": 1, "fan": 400,"debt": 65, "tv": 80,},
             "43": {"name": "Juventus", "type": 1, "fan": 642,"debt": 70, "tv": 79,},
             "44": {"name": "Lazio", "type": 2, "fan": 130,"debt": 40, "tv": 71,},
-            "45": {"name": "Roma", "type": 1, "fan": 276,"debt": 50, "tv": 68,},
+            "45": {"name": "Roma", "type": 2, "fan": 276,"debt": 50, "tv": 68,},
             "46": {"name": "Fiorentina", "type": 2, "fan": 194, "debt": 45, "tv": 55,},
             "47": {"name": "Atalanta", "type": 2, "fan": 130,"debt": 40, "tv": 55,},
             "48": {"name": "Torino", "type": 3, "fan": 70,"debt": 20, "tv": 49,},
@@ -96,7 +96,7 @@ class MyModel(mesa.Model):
             "52": {"name": "Sassuolo", "type": 2, "fan": 120,"debt": 30, "tv": 39,},
             "53": {"name": "Lecce", "type": 3, "fan": 35,"debt": 5, "tv": 39,},
             "54": {"name": "Monza", "type": 3, "fan": 30,"debt": 0, "tv": 34,},
-            "55": {"name": "Hellas Verona", "type": 2, "fan": 102,"debt": 30, "tv": 34,},
+            "55": {"name": "Hellas Verona", "type": 3, "fan": 102,"debt": 30, "tv": 34,},
             "56": {"name": "Salernitana", "type": 3, "fan": 28,"debt": 0, "tv": 33,},
             "57": {"name": "Empoli", "type": 3, "fan": 76,"debt": 18, "tv": 33,},
             "58": {"name": "Spezia", "type": 3, "fan": 22,"debt": 0, "tv": 30,},
@@ -105,18 +105,18 @@ class MyModel(mesa.Model):
             # 60 - 77: Bundesliga 22/23 1065 tv
             "60": {"name": "Bayern Munich", "type": 1, "fan": 900,"debt": 120, "tv": 95,},
             "61": {"name": "Dortmund", "type": 1, "fan": 676,"debt": 90, "tv": 82,},
-            "62": {"name": "RB Leipzig", "type": 1, "fan": 380,"debt": 80, "tv": 80,},
+            "62": {"name": "RB Leipzig", "type": 2, "fan": 380,"debt": 80, "tv": 80,},
             "63": {"name": "Bayer Leverkusen", "type": 2, "fan": 248,"debt": 45, "tv": 79,},
             "64": {"name": "Frankfurt", "type": 2, "fan": 242,"debt": 45, "tv": 77,},
-            "65": {"name": "Monchengladbach", "type": 2, "fan": 124,"debt": 28, "tv": 67,},
+            "65": {"name": "Monchengladbach", "type": 3, "fan": 124,"debt": 28, "tv": 67,},
             "66": {"name": "Wolfsburg", "type": 2, "fan": 168,"debt": 30, "tv": 65,},
             "67": {"name": "Hoffenheim", "type": 3, "fan": 116,"debt": 18, "tv": 63,},
-            "68": {"name": "Freiburg", "type": 2, "fan": 120,"debt": 18, "tv": 55,},
-            "69": {"name": "Union Berlin", "type": 2, "fan": 134,"debt": 20, "tv": 55,},
-            "70": {"name": "Mainz 05", "type": 2, "fan": 128,"debt": 20, "tv": 51,},
+            "68": {"name": "Freiburg", "type": 3, "fan": 120,"debt": 18, "tv": 55,},
+            "69": {"name": "Union Berlin", "type": 3, "fan": 134,"debt": 20, "tv": 55,},
+            "70": {"name": "Mainz 05", "type": 3, "fan": 128,"debt": 20, "tv": 51,},
             "71": {"name": "FC Koln", "type": 3, "fan": 96,"debt": 25, "tv": 50,},
             "72": {"name": "Hertha", "type": 3, "fan": 98,"debt": 25, "tv": 48,},
-            "73": {"name": "Schalke 04", "type": 2, "fan": 146,"debt": 30, "tv": 44,},
+            "73": {"name": "Schalke 04", "type": 3, "fan": 146,"debt": 30, "tv": 44,},
             "74": {"name": "Augsburg", "type": 3, "fan": 94,"debt": 12, "tv": 44,},
             "75": {"name": "Stuttgart", "type": 3, "fan": 98,"debt": 28, "tv": 41,},
             "76": {"name": "Werder Bremen", "type": 3, "fan": 114,"debt": 20, "tv": 36,},
@@ -124,25 +124,25 @@ class MyModel(mesa.Model):
 
             # 78 - 97: Ligue 1 21/22
             "78": {"name": "PSG", "type": 1, "fan": 950,"debt": 200, "tv": 140,},
-            "79": {"name": "Marseilles", "type": 1, "fan": 362,"debt": 40, "tv": 57,},
-            "80": {"name": "Lyon", "type": 1, "fan": 360,"debt": 10, "tv": 60,},
+            "79": {"name": "Marseilles", "type": 2, "fan": 362,"debt": 40, "tv": 57,},
+            "80": {"name": "Lyon", "type": 2, "fan": 200,"debt": 10, "tv": 60,},
             "81": {"name": "LOSC", "type": 2, "fan": 116,"debt": 40, "tv": 90,},
-            "82": {"name": "Monaco", "type": 1, "fan": 54,"debt": 40, "tv": 59,},
+            "82": {"name": "Monaco", "type": 2, "fan": 54,"debt": 40, "tv": 59,},
             "83": {"name": "Rennes", "type": 2, "fan": 92,"debt": 35, "tv": 37,},
-            "84": {"name": "Angers", "type": 1, "fan": 32,"debt": 5, "tv": 19,},
-            "85": {"name": "Bordeaux", "type": 1, "fan": 58,"debt": 10, "tv": 21,},
-            "86": {"name": "Brest", "type": 1, "fan": 54,"debt": 8, "tv": 17,},
-            "87": {"name": "Clermont", "type": 1, "fan": 20,"debt": 0, "tv": 16,},
-            "88": {"name": "Lens", "type": 1, "fan": 52,"debt": 12, "tv": 21,},
-            "89": {"name": "Lorient", "type": 1, "fan": 36,"debt": 8, "tv": 16,},
-            "90": {"name": "Metz", "type": 1, "fan": 38,"debt": 8, "tv": 17,},
-            "91": {"name": "Montpellier", "type": 1, "fan": 36,"debt": 10, "tv": 21,},
-            "92": {"name": "Nantes", "type": 1, "fan": 54,"debt": 15, "tv": 25,},
+            "84": {"name": "Angers", "type": 3, "fan": 32,"debt": 5, "tv": 19,},
+            "85": {"name": "Bordeaux", "type": 3, "fan": 58,"debt": 10, "tv": 21,},
+            "86": {"name": "Brest", "type": 3, "fan": 54,"debt": 8, "tv": 17,},
+            "87": {"name": "Clermont", "type": 3, "fan": 20,"debt": 0, "tv": 16,},
+            "88": {"name": "Lens", "type": 3, "fan": 52,"debt": 12, "tv": 21,},
+            "89": {"name": "Lorient", "type": 3, "fan": 36,"debt": 8, "tv": 16,},
+            "90": {"name": "Metz", "type": 3, "fan": 38,"debt": 8, "tv": 17,},
+            "91": {"name": "Montpellier", "type": 3, "fan": 36,"debt": 10, "tv": 21,},
+            "92": {"name": "Nantes", "type": 3, "fan": 54,"debt": 15, "tv": 25,},
             "93": {"name": "Nice", "type": 2, "fan": 98,"debt": 30, "tv": 29,},
-            "94": {"name": "Reims", "type": 1, "fan": 34,"debt": 8, "tv": 19,},
-            "95": {"name": "Saint-Etienne", "type": 1, "fan": 80,"debt": 30, "tv": 32,},
-            "96": {"name": "Strasbourg", "type": 1, "fan": 66,"debt": 20, "tv": 24,},
-            "97": {"name": "Troyes", "type": 1, "fan": 20,"debt": 0, "tv": 16,},
+            "94": {"name": "Reims", "type": 3, "fan": 34,"debt": 8, "tv": 19,},
+            "95": {"name": "Saint-Etienne", "type": 2, "fan": 80,"debt": 30, "tv": 32,},
+            "96": {"name": "Strasbourg", "type": 3, "fan": 66,"debt": 20, "tv": 24,},
+            "97": {"name": "Troyes", "type": 3, "fan": 20,"debt": 0, "tv": 16,},
         
         }
         
@@ -151,11 +151,15 @@ class MyModel(mesa.Model):
                 "Winner Club": self.get_winner,
                 "Season": lambda model: model.season,
                 "Average revenue by league": self.calculate_avg_revenue_by_league,
+                "Total revenue by league": self.calculate_total_revenue_by_league,
                 # "Team size": self.team_size,
             },
             agent_reporters={
                 "Club Revenue": lambda agent: agent.revenue if isinstance(agent, Club) else None,
                 "Team size": lambda agent: len(agent.team) if isinstance(agent, Club) else None,
+                "Name": lambda agent: agent.name if isinstance(agent, Club) else None,
+                "TV": lambda agent: agent.tv_rights if isinstance(agent, Club) else None,
+                "Type": lambda agent: agent.type if isinstance(agent, Club) else None,
             },
         )
 
@@ -167,19 +171,19 @@ class MyModel(mesa.Model):
     def step(self):
 
         if self.is_initial_step:
-            print("Step: 0")
+            # print("Step: 0")
             self.is_initial_step = False
         self.schedule.step()
 
-        print("\nStep:", self.schedule.steps)
+        # print("\nStep:", self.schedule.steps)
 
         if self.schedule.steps != 0:
             self.agent_incentives()
 
         if self.schedule.steps != 0 and self.schedule.steps % 4 == 0:
-            print("Season over")
+            # print("Season over")
             self.final_skill_levels()
-            self.print_final_skill_levels()
+            # self.print_final_skill_levels()
             self.winner()
             self.retire_players()
 
@@ -187,8 +191,8 @@ class MyModel(mesa.Model):
             
         if self.schedule.steps != 0 and self.schedule.steps % 2 == 0:
             self.average_skill_levels()
-            self.print_average_skill_levels()
-            print("Transfer market opens")
+            # self.print_average_skill_levels()
+            # print("Transfer market opens")
             self.open_market()
             self.club_incentives()
 
@@ -199,8 +203,8 @@ class MyModel(mesa.Model):
         if player_count < self.num_players:
             self.create_players(self.num_players - player_count)
 
-        if self.schedule.steps != 1 and self.schedule.steps % 2 == 1:
-            print("Close")
+        # if self.schedule.steps != 1 and self.schedule.steps % 2 == 1:
+            # print("Close")
             # self.average_skill_levels()
             # self.print_average_skill_levels()
             # self.print_club_spending()
@@ -208,7 +212,7 @@ class MyModel(mesa.Model):
         if self.FFP and self.schedule.steps % 12 == 0:
             self.sanctions
 
-        print("\n")
+        # print("\n")
         # Collect data at each step
         self.datacollector.collect(self)        
 
@@ -216,44 +220,49 @@ class MyModel(mesa.Model):
 
     # Functions
     def create_clubs(self, C):
-        # Handle single league range
-        if not isinstance(self.league_range, list):
-            self.league_range = [self.league_range]
+        if self.league_range is not None:
+            # Handle single league range
+            if not isinstance(self.league_range, list):
+                self.league_range = [self.league_range]
 
-        for league_range in self.league_range:
-            start, end = league_range
-            for keys in range(start, end+1):
-                club_data = self.league_data[str(keys)]
+            for league_range in self.league_range:
+                start, end = league_range
+                for keys in range(start, end+1):
+                    club_data = self.league_data[str(keys)]
+                    club = Club(self.club_id, self, type = random.randint(1, 3))
+                    self.club_id += 1
+                    club.name = club_data["name"]
+                    club.type = club_data["type"]
+                    club.fans = club_data["fan"]
+                    club.allowed_debt = club_data["debt"]
+                    club.tv_rights = club_data["tv"]
+                    club.set_revenue()
+                    club.set_spending()
+
+                    # Determine the club's league based on its key in league_data
+                    if 0 <= keys <= 19:
+                        club.league = "Premier League"
+                    elif 20 <= keys <= 39:
+                        club.league = "La Liga"
+                    elif 40 <= keys <= 59:
+                        club.league = "Serie A"
+                    elif 60 <= keys <= 77:
+                        club.league = "Bundesliga"
+                    elif 78 <= keys <= 97:
+                        club.league = "Ligue 1"
+
+
+                    self.schedule.add(club)
+                    self.clubs.append(club)
+        else:
+            for i in range(C):
                 club = Club(self.club_id, self, type = random.randint(1, 3))
+                club.name = str(self.club_id)
                 self.club_id += 1
-                club.name = club_data["name"]
-                club.type = club_data["type"]
-                club.fans = club_data["fan"]
-                club.allowed_debt = club_data["debt"]
-                club.tv_rights = club_data["tv"]
                 club.set_revenue()
                 club.set_spending()
-
-                # Determine the club's league based on its key in league_data
-                if 0 <= keys <= 19:
-                    club.league = "Premier League"
-                elif 20 <= keys <= 39:
-                    club.league = "La Liga"
-                elif 40 <= keys <= 59:
-                    club.league = "Serie A"
-                elif 60 <= keys <= 77:
-                    club.league = "Bundesliga"
-                elif 78 <= keys <= 97:
-                    club.league = "Ligue 1"
-
-
                 self.schedule.add(club)
                 self.clubs.append(club)
-
-                # Add players to a random grid cell
-                x = self.random.randrange(self.grid.width)
-                y = self.random.randrange(self.grid.height)
-                self.grid.place_agent(club, (x, y))
 
     def create_agents(self, F):
         for i in range(F):
@@ -261,10 +270,10 @@ class MyModel(mesa.Model):
             self.schedule.add(f_agent)
             self.pool.append(f_agent)
 
-            # Add players to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(f_agent, (x, y))
+            # # Add players to a random grid cell
+            # x = self.random.randrange(self.grid.width)
+            # y = self.random.randrange(self.grid.height)
+            # self.grid.place_agent(f_agent, (x, y))
 
     def create_players(self, P):
         for i in range(P):
@@ -284,8 +293,8 @@ class MyModel(mesa.Model):
             if available_agents:
                 choice = random.choice(available_agents)
                 player.link_agent(choice)
-            else:
-                print("No available agents to link player", player_id)
+            # else:
+            #     print("No available agents to link player", player_id)
 
             # Link players to clubs evenly
             max_c = self.num_players / self.num_clubs
@@ -293,23 +302,23 @@ class MyModel(mesa.Model):
             if available_clubs:
                 choice = random.choice(available_clubs)
                 player.join_club(choice)
-            else:
-                print("No available clubs to join for player", player_id)
+            # else:
+            #     print("No available clubs to join for player", player_id)
 
             player.set_salary()
             player.set_value()
 
-            # Add players to a random grid cell
-            x = self.random.randrange(self.grid.width)
-            y = self.random.randrange(self.grid.height)
-            self.grid.place_agent(player, (x, y))
+            # # Add players to a random grid cell
+            # x = self.random.randrange(self.grid.width)
+            # y = self.random.randrange(self.grid.height)
+            # self.grid.place_agent(player, (x, y))
 
     # Players go to retirement when age >= 40
     def retire_players(self):
         players_to_retire = [player for player in self.schedule.agents if isinstance(player, Players) and player.age == 37]
         if players_to_retire:
             for agent in players_to_retire:
-                print("Player " + str(agent.unique_id) + " retires!")
+                # print("Player " + str(agent.unique_id) + " retires!")
 
                 if agent.F_agent is not None:
                     agent.F_agent.clients.remove(agent)
@@ -318,9 +327,9 @@ class MyModel(mesa.Model):
                     agent.club.team.remove(agent)
 
                 self.schedule.remove(agent)
-                self.grid.remove_agent(agent)
-        else:
-            print("No players retire!")
+                # self.grid.remove_agent(agent)
+        # else:
+        #     print("No players retire!")
 
     # Count current players in the model
     def count_players(self):
@@ -384,7 +393,7 @@ class MyModel(mesa.Model):
                 break
 
         if winning_club is not None:
-            print("The winner of season " + str(self.season) + " is " + str(winning_club.name) + ". \n")
+            # print("The winner of season " + str(self.season) + " is " + str(winning_club.name) + ". \n")
             self.winner_id = max_key
             self.winner_name = winning_club.name
 
@@ -402,7 +411,7 @@ class MyModel(mesa.Model):
     # Print club spending
     def print_club_spending(self):
         for club in self.clubs:
-            print("Club " + str(club.unique_id) + " spends " + str(round(club.spending,2)) + ".") 
+            print("Club " + str(club.name) + " spends " + str(round(club.spending,2)) + ".") 
 
     # Open the market and list all the players
     def open_market(self):
@@ -425,7 +434,7 @@ class MyModel(mesa.Model):
 
     # Player transfer
     def bid(self, player, club, offer):
-        print("Club", club.unique_id, "bought player", player.unique_id)
+        # print("Club", club.unique_id, "bought player", player.unique_id)
         if player.club is not None:
             # Change attributes following the transfer
             player.club.revenue_from_sales += offer
@@ -460,8 +469,8 @@ class MyModel(mesa.Model):
             if player.club is not None:
                 if len(player.club.team) > MIN_SQUAD_SIZE:
                     self.bid(player, best_offer, best_offer_value)
-                else:
-                    print("Seller club does not have enough player.")
+                # else:
+                #     print("Seller club does not have enough player.")
             else:
                 self.bid(player, best_offer, best_offer_value)
             
@@ -489,8 +498,8 @@ class MyModel(mesa.Model):
                  # Find the worst player of the team
                 if club.team:
                     min_player = min(club.team, key=lambda player: player.skill)
-                else:
-                    print("Club", club.unique_id, "has no players in the team.")
+                # else:
+                #     print("Club", club.unique_id, "has no players in the team.")
 
                 if club.type == 1:
 
@@ -534,8 +543,8 @@ class MyModel(mesa.Model):
                 if player.club is not None:
                     if len(player.club.team) > MIN_SQUAD_SIZE:
                         self.transfer(player, interested_clubs[0])
-                    else:
-                        print("Seller club does not have enough player.")
+                    # else:
+                    #     print("Seller club does not have enough player.")
                 else:
                     self.transfer(player, interested_clubs[0])
 
@@ -564,13 +573,13 @@ class MyModel(mesa.Model):
 
                         # Execute the transfer if target is better than worst player of the team
                         if target is not None and target.skill > min_player.skill:
-                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # print("Club", club.unique_id, "bought player", target.unique_id)
                             return club, target
 
                     else:
-                        print("Club", club.unique_id, "has no players in the team.")
+                        # print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought player", target.unique_id)
+                        # print("So Club", club.unique_id, "has bought player", target.unique_id)
                         return club, target
 
                 # Behavior for Medium clubs - search for players both good skill level and potential
@@ -588,12 +597,12 @@ class MyModel(mesa.Model):
                         # Execute the transfer if target has higher skill and potential than the worst player of the team
                         if target is not None and target.skill > min_player.skill and target.potential > min_player.skill:
                             self.transfer(target, club)
-                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # print("Club", club.unique_id, "bought player", target.unique_id)
                             return club, target
                     else:
-                        print("Club", club.unique_id, "has no players in the team.")
+                        # print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought", target.unique_id)
+                        # print("So Club", club.unique_id, "has bought", target.unique_id)
                         return club, target
 
                 # Behavior for Small clubs - search for players with high potential
@@ -609,12 +618,12 @@ class MyModel(mesa.Model):
                         # Execute the transfer if target has higher potential than the worst player of the team
                         if target is not None and target.potential > min_player.skill:
                             self.transfer(target, club)
-                            print("Club", club.unique_id, "bought player", target.unique_id)
+                            # print("Club", club.unique_id, "bought player", target.unique_id)
                             return club, target
                     else:
-                        print("Club", club.unique_id, "has no players in the team.")
+                        # print("Club", club.unique_id, "has no players in the team.")
                         self.transfer(target, club)
-                        print("So Club", club.unique_id, "has bought", target.unique_id)
+                        # print("So Club", club.unique_id, "has bought", target.unique_id)
                         return club, target
         return False
 
@@ -670,6 +679,21 @@ class MyModel(mesa.Model):
         
         return avg_revenue_by_league
     
+    def calculate_total_revenue_by_league(self):
+        league_revenue = {}
+        for club in self.clubs:
+            league = club.league
+            revenue = club.revenue
+            if league in league_revenue:
+                league_revenue[league] += revenue
+            else:
+                league_revenue[league] = revenue
+
+        # Return the dictionary with total revenue by league
+        return league_revenue
+
+
     def team_size(self):
         team_sizes = {club.unique_id: len(club.team) for club in self.clubs}
         return team_sizes
+    
